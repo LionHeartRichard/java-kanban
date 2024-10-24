@@ -1,10 +1,22 @@
 package kanban.model.impl;
 
+import kanban.model.util.Status;
+
 public class Subtask extends Task {
 
-	public Subtask(Task task, long id) {
-		super(task);
-		this.id = id;
+	private static final String PREFIX = "Subtask-";
+
+	private static long count;
+
+	public Subtask() {
+		++count;
+		id = PREFIX + count;
+		status = Status.NEW;
 	}
 
+	public Subtask(String name, String description) {
+		++count;
+		id = PREFIX + count;
+		status = Status.NEW;
+	}
 }

@@ -1,33 +1,35 @@
 package kanban.model.impl;
 
 import java.util.Objects;
-
 import kanban.model.TaskInterface;
 import kanban.model.util.Status;
 
 public class Task implements TaskInterface {
 
-	protected long id;
+	private static final String PREFIX = "Task-";
+	private static long count;
+
+	protected String id;
 	protected String name;
 	protected String description;
 	protected Status status;
 
-	public Task(long id, String name, String description) {
-		this.id = id;
+	public Task() {
+		++count;
+		id = PREFIX + count;
+		status = Status.NEW;
+	}
+
+	public Task(String name, String description) {
+		++count;
+		id = PREFIX + count;
 		this.name = name;
 		this.description = description;
 		status = Status.NEW;
 	}
 
-	public Task(Task task) {
-		this.id = task.id;
-		this.name = task.name;
-		this.description = task.description;
-		status = task.status;
-	}
-
 	@Override
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -50,8 +52,11 @@ public class Task implements TaskInterface {
 	}
 
 	@Override
-	public void setName(String name) {
+	public boolean setName(String name) {
+		if (name == null || name.isEmpty())
+			return false;
 		this.name = name;
+		return true;
 	}
 
 	@Override
@@ -60,8 +65,11 @@ public class Task implements TaskInterface {
 	}
 
 	@Override
-	public void setDescription(String descrition) {
+	public boolean setDescription(String descrition) {
+		if (descrition == null || descrition.isEmpty())
+			return false;
 		this.description = descrition;
+		return true;
 	}
 
 	@Override
