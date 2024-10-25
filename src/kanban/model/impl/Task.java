@@ -2,7 +2,7 @@ package kanban.model.impl;
 
 import java.util.Objects;
 import kanban.model.TaskInterface;
-import kanban.model.util.Status;
+import kanban.util.Status;
 
 public class Task implements TaskInterface {
 

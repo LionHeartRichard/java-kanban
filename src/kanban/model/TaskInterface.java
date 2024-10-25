@@ -1,6 +1,6 @@
 package kanban.model;
 
-import kanban.model.util.Status;
+import kanban.util.Status;
 
 public interface TaskInterface {
 
