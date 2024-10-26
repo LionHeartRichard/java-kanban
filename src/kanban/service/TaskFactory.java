@@ -16,6 +16,10 @@ public class TaskFactory {
 		map.put(id, task);
 	}
 
+	public boolean containsTask(String id) {
+		return map.containsKey(id);
+	}
+
 	public void clearTasks() {
 		map.clear();
 	}
@@ -41,6 +45,11 @@ public class TaskFactory {
 			if (task.getStatus() == status)
 				result.add(task);
 		}
+		return result;
+	}
+
+	public List<TaskInterface> getTasks() {
+		List<TaskInterface> result = new ArrayList<>(map.values());
 		return result;
 	}
 

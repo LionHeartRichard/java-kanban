@@ -23,9 +23,9 @@ public class Task implements TaskInterface {
 	public Task(String name, String description) {
 		++count;
 		id = PREFIX + count;
+		status = Status.NEW;
 		this.name = name;
 		this.description = description;
-		status = Status.NEW;
 	}
 
 	@Override
@@ -92,6 +92,11 @@ public class Task implements TaskInterface {
 			return false;
 		Task other = (Task) obj;
 		return id == other.id;
+	}
+
+	@Override
+	public String toString() {
+		return "Task [id=" + id + ", name=" + name + ", description=" + description + ", status=" + status + "]";
 	}
 
 }

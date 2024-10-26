@@ -25,6 +25,14 @@ public class Graph<T> {
 		map.put(vertex, new HashSet<T>());
 	}
 
+	public void addEdge(T topVertex, T vertex) {
+		if (!map.containsKey(topVertex))
+			addVertex(topVertex);
+		if (!map.containsKey(vertex))
+			addVertex(vertex);
+		map.get(topVertex).add(vertex);
+	}
+
 	public void addEdge(T topVertex, T vertex, boolean bidirectional) {
 		if (!map.containsKey(topVertex))
 			addVertex(topVertex);

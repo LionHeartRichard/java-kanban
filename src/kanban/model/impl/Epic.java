@@ -17,5 +17,7 @@ public class Epic extends Task {
 		++count;
 		id = PREFIX + count;
 		status = Status.NEW;
+		this.name = name;
+		this.description = description;
 	}
 }
