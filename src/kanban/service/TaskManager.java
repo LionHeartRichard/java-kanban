@@ -1,6 +1,8 @@
 package kanban.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import kanban.model.TaskInterface;
 import kanban.util.Graph;
@@ -24,30 +26,27 @@ public class TaskManager {
 	 */
 
 	private boolean isInit = false;
-	private Graph<TaskInterface> cacheGraph; // хранить только ИДЕНТИФИКАТОРЫ для связи а не весь объект!!!
+	private Graph<String> cacheGraph;
 	private TaskFactory cacheFactory;
 
 	public boolean initManagerTasks(List<TaskInterface> tasks) {
 		if (tasks == null || tasks.isEmpty())
 			return isInit;
 		cacheFactory = getTaskFactory(tasks);
-		cacheGraph = getGraph(cacheFactory);
+		cacheGraph = getGraph();
 		isInit = true;
 		return isInit;
 	}
 
 	private TaskFactory getTaskFactory(List<TaskInterface> tasks) {
 		TaskFactory factory = new TaskFactory();
-		for (TaskInterface task : tasks) {
-			task.registerMyself(factory);
-			factory.register(task.getId(), task);
-		}
+		tasks.forEach(v -> v.registerMyself(factory));
 		return factory;
 	}
 
-	private Graph<TaskInterface> getGraph(TaskFactory factory) {
-		Graph<TaskInterface> graph = new Graph<>();
-		factory.getTasks().forEach(v -> graph.addVertex(v));
+	private Graph<String> getGraph() {
+		Graph<String> graph = new Graph<>();
+		cacheFactory.getTasks().forEach(v -> graph.addVertex(v.getId()));
 		return graph;
 	}
 
@@ -56,8 +55,7 @@ public class TaskManager {
 			if (cacheFactory.containsTask(task.getId()))
 				return false;
 			task.registerMyself(cacheFactory);
-			cacheFactory.register(task.getId(), task);
-			cacheGraph.addVertex(task);
+			cacheGraph.addVertex(task.getId());
 			return isInit;
 		}
 		return isInit;
@@ -66,14 +64,32 @@ public class TaskManager {
 	public boolean addTask(TaskInterface topTask, TaskInterface task) {
 		if (isInit) {
 			if (!cacheFactory.containsTask(topTask.getId())) {
-				addTask(topTask);
+				addTaskNotCheckNull(topTask);
 			}
 			if (!cacheFactory.containsTask(task.getId())) {
-				addTask(task);
+				addTaskNotCheckNull(task);
 			}
+			cacheGraph.addEdgeWithoutCheckNullByKeyMap(topTask.getId(), task.getId());
 
 		}
 		return isInit;
+	}
+
+	public boolean addTask(TaskInterface topTask, Set<TaskInterface> tasks) {
+		if (isInit) {
+			addTaskNotCheckNull(topTask); // check - repeat add!!!!!!!!!!
+			String idByTopTask = topTask.getId();
+			for (TaskInterface task : tasks) {
+				addTaskNotCheckNull(task);
+				cacheGraph.addEdgeWithoutCheckNullByKeyMap(idByTopTask, task.getId());
+			}
+		}
+		return isInit;
+	}
+
+	private void addTaskNotCheckNull(TaskInterface task) { // check - repeat add!!!!!!!!!!
+		task.registerMyself(cacheFactory);
+		cacheGraph.addVertex(task.getId());
 	}
 
 }
