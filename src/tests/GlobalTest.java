@@ -11,9 +11,7 @@ import kanban.model.TaskInterface;
 import kanban.model.impl.Epic;
 import kanban.model.impl.Subtask;
 import kanban.model.impl.Task;
-import kanban.service.TaskFactory;
 import kanban.util.Graph;
-import kanban.util.Status;
 
 public class GlobalTest {
 
@@ -151,21 +149,4 @@ public class GlobalTest {
 		actualDFS.forEach(v -> System.out.println(v));
 	}
 
-	@Test
-	public void testInitTaskMeneger() {
-		
-	}
-
-	@Test
-	public void testChangeStatusForEpic() {
-
-	}
-
-	/*
-	 * 
-	 * c. Получение по идентификатору. d. Создание. Сам объект должен передаваться в
-	 * качестве параметра. e. Обновление. Новая версия объекта с верным
-	 * идентификатором передаётся в виде параметра. f. Удаление по идентификатору.
-	 * Дополнительные методы: a. Получение списка всех подзадач определённого эпика.
-	 */
 }

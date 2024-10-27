@@ -142,15 +142,23 @@ public class TaskManager {
 		return cacheFactory.getSetTasks();
 	}
 
-	public TaskInterface getTask(String id) {
-		return cacheFactory.getTaskById(id);
-	}
-
 	public boolean updateTask(String id, String newName, String newDescription) {
 		if (isInit) {
 			if (cacheFactory.containsTask(id)) {
 				cacheFactory.getTaskById(id).setName(newName);
 				cacheFactory.getTaskById(id).setDescription(newDescription);
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+
+	public boolean updateTask(TaskInterface task) {
+		if (isInit) {
+			if (cacheFactory.containsTask(task.getId())) {
+				cacheFactory.getTaskById(task.getId()).setName(task.getName());
+				cacheFactory.getTaskById(task.getId()).setDescription(task.getDescription());
 				return true;
 			}
 			return false;
