@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.Set;
 
 import kanban.model.TaskInterface;
+import kanban.model.impl.Epic;
+import kanban.model.impl.Subtask;
+import kanban.model.impl.Task;
 import kanban.util.Graph;
+import kanban.util.Status;
 
 public class TaskManager {
 
@@ -62,7 +66,7 @@ public class TaskManager {
 
 	public boolean addTask(TaskInterface topTask, Set<TaskInterface> tasks) {
 		if (isInit) {
-			addTaskNotCheckNull(topTask); // check - repeat add!!!!!!!!!!
+			addTaskNotCheckNull(topTask);
 			String idTopTask = topTask.getId();
 			for (TaskInterface task : tasks) {
 				addTaskNotCheckNull(task);
@@ -110,7 +114,7 @@ public class TaskManager {
 		return true;
 	}
 
-	public Set<TaskInterface> quickGetSubtasks(String id) {
+	public Set<TaskInterface> getQuickSubtasks(String id) {
 		if (cacheFactory.containsTask(id)) {
 			Set<TaskInterface> result = new HashSet<>();
 			Set<String> tmp = cacheGraph.DFS(id);
@@ -140,6 +144,71 @@ public class TaskManager {
 
 	public TaskInterface getTask(String id) {
 		return cacheFactory.getTaskById(id);
+	}
+
+	public boolean updateTask(String id, String newName, String newDescription) {
+		if (isInit) {
+			if (cacheFactory.containsTask(id)) {
+				cacheFactory.getTaskById(id).setName(newName);
+				cacheFactory.getTaskById(id).setDescription(newDescription);
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+
+	public List<TaskInterface> getListTasksByStatus(Status status) {
+		return cacheFactory.getListTasksByStatus(status);
+	}
+
+	public boolean changeStatusSubtask(String id) {
+		if (isInit) {
+			if (!cacheFactory.containsTask(id))
+				return false;
+			TaskInterface task = cacheFactory.getTaskByIdNotCheckNull(id);
+			if (task instanceof Subtask) {
+				cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean changeStatusTask(String id) {
+		if (isInit) {
+			if (!cacheFactory.containsTask(id))
+				return false;
+			TaskInterface task = cacheFactory.getTaskByIdNotCheckNull(id);
+			if (task instanceof Task) {
+				Set<TaskInterface> subtasks = getQuickSubtasks(id);
+				for (TaskInterface subtask : subtasks) {
+					if (subtask.getStatus() != Status.DONE)
+						return false;
+				}
+				cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean changeStatusEpic(String id) {
+		if (isInit) {
+			if (!cacheFactory.containsTask(id))
+				return false;
+			TaskInterface epic = cacheFactory.getTaskByIdNotCheckNull(id);
+			if (epic instanceof Epic) {
+				Set<TaskInterface> tasks = getQuickSubtasks(id);
+				for (TaskInterface task : tasks) {
+					if (task.getStatus() != Status.DONE)
+						return false;
+				}
+				cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
