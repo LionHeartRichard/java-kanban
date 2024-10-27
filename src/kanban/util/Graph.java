@@ -99,15 +99,21 @@ public class Graph<T> {
 	}
 
 	public List<T> getListAllVertices() {
-		List<T> vertices = new ArrayList<T>();
-		map.keySet().forEach(v -> vertices.add(v));
+		List<T> vertices = new ArrayList<T>(map.keySet());
 		return vertices;
 	}
 
 	public Set<T> getSetAllVertices() {
-		Set<T> vertices = new HashSet<>();
-		map.keySet().forEach(v -> vertices.add(v));
+		Set<T> vertices = new HashSet<>(map.keySet());
 		return vertices;
+	}
+
+	public void removeVertices() {
+		map.clear();
+	}
+
+	public void removeVertex(T vertex) {
+		map.remove(vertex);
 	}
 
 }

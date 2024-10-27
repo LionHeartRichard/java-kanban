@@ -1,5 +1,6 @@
 package kanban.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,22 +9,6 @@ import kanban.model.TaskInterface;
 import kanban.util.Graph;
 
 public class TaskManager {
-	/*
-	 * Возможность хранить задачи всех типов. Для этого вам нужно выбрать подходящую
-	 * коллекцию. Методы для каждого из типа задач(Задача/Эпик/Подзадача): a.
-	 * Получение списка всех задач. b. Удаление всех задач. c. Получение по
-	 * идентификатору. d. Создание. Сам объект должен передаваться в качестве
-	 * параметра. e. Обновление. Новая версия объекта с верным идентификатором
-	 * передаётся в виде параметра. f. Удаление по идентификатору. Дополнительные
-	 * методы: a. Получение списка всех подзадач определённого эпика. Управление
-	 * статусами осуществляется по следующему правилу: a. Менеджер сам не выбирает
-	 * статус для задачи. Информация о нём приходит менеджеру вместе с информацией о
-	 * самой задаче. По этим данным в одних случаях он будет сохранять статус, в
-	 * других будет рассчитывать. b. Для эпиков: если у эпика нет подзадач или все
-	 * они имеют статус NEW, то статус должен быть NEW. если все подзадачи имеют
-	 * статус DONE, то и эпик считается завершённым — со статусом DONE. во всех
-	 * остальных случаях статус должен быть IN_PROGRESS.
-	 */
 
 	private boolean isInit = false;
 	private Graph<String> cacheGraph;
@@ -78,10 +63,22 @@ public class TaskManager {
 	public boolean addTask(TaskInterface topTask, Set<TaskInterface> tasks) {
 		if (isInit) {
 			addTaskNotCheckNull(topTask); // check - repeat add!!!!!!!!!!
-			String idByTopTask = topTask.getId();
+			String idTopTask = topTask.getId();
 			for (TaskInterface task : tasks) {
 				addTaskNotCheckNull(task);
-				cacheGraph.addEdgeWithoutCheckNullByKeyMap(idByTopTask, task.getId());
+				cacheGraph.addEdgeWithoutCheckNullByKeyMap(idTopTask, task.getId());
+			}
+		}
+		return isInit;
+	}
+
+	public boolean addTask(TaskInterface topTask, List<TaskInterface> tasks) {
+		if (isInit) {
+			addTaskNotCheckNull(topTask);
+			String idTopTask = topTask.getId();
+			for (TaskInterface task : tasks) {
+				addTaskNotCheckNull(task);
+				cacheGraph.addEdgeWithoutCheckNullByKeyMap(idTopTask, task.getId());
 			}
 		}
 		return isInit;
@@ -90,6 +87,59 @@ public class TaskManager {
 	private void addTaskNotCheckNull(TaskInterface task) { // check - repeat add!!!!!!!!!!
 		task.registerMyself(cacheFactory);
 		cacheGraph.addVertex(task.getId());
+	}
+
+	public boolean containsTaskById(String id) {
+		return cacheFactory.containsTask(id);
+	}
+
+	public void removeTasks() {
+		cacheFactory.removeTasks();
+		cacheGraph.removeVertices();
+	}
+
+	public TaskInterface getTaskById(String id) {
+		return cacheFactory.getTaskById(id);
+	}
+
+	public boolean removeTaskById(String id) {
+		if (!cacheFactory.containsTask(id))
+			return false;
+		cacheFactory.removeTaskById(id);
+		cacheGraph.removeVertex(id);
+		return true;
+	}
+
+	public Set<TaskInterface> quickGetSubtasks(String id) {
+		if (cacheFactory.containsTask(id)) {
+			Set<TaskInterface> result = new HashSet<>();
+			Set<String> tmp = cacheGraph.DFS(id);
+			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(id)));
+			return result;
+		}
+		return null;
+	}
+
+	public List<TaskInterface> getSubtasks(String id) {
+		if (cacheFactory.containsTask(id)) {
+			List<TaskInterface> result = new ArrayList<>();
+			List<String> tmp = cacheGraph.BFS(id);
+			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(id)));
+			return result;
+		}
+		return null;
+	}
+
+	public List<TaskInterface> getAllTasks() {
+		return cacheFactory.getTasks();
+	}
+
+	public Set<TaskInterface> getAllSetTasks() {
+		return cacheFactory.getSetTasks();
+	}
+
+	public TaskInterface getTask(String id) {
+		return cacheFactory.getTaskById(id);
 	}
 
 }
