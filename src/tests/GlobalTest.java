@@ -35,11 +35,14 @@ public class GlobalTest {
 		adjacent.addEdge("A-33", "A-43");
 
 		Set<String> setDFS = adjacent.DFS("A");
+		// тут можно поменять значения чтобы посмотреть как функционирует обход в
+		// глубину
 		setDFS.forEach(v -> System.out.print(v + " | "));
 		System.out.println();
 		System.out.println("-".repeat(100));
 
 		List<String> listBFS = adjacent.BFS("A");
+		// тут можно поменять значения чтобы посмотреть как функционирует обход в ширину
 		listBFS.forEach(v -> System.out.print(v + " | "));
 		System.out.println();
 		System.out.println("-".repeat(100));

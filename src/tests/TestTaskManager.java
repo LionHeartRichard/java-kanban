@@ -24,8 +24,8 @@ public class TestTaskManager {
 	private static final int COUNT_TASKS = 8;
 
 	@Test
-	public void testInitManagerTasks() {
-		System.out.println("testInitManagerTasks");
+	public void testConstructorManagerTasks() {
+		System.out.println("testConstructorManagerTasks");
 
 		List<TaskInterface> tasks = new ArrayList<>();
 		tasks.add(new Task("task1", "description-task-1"));
@@ -36,8 +36,7 @@ public class TestTaskManager {
 		tasks.add(new Subtask());
 		tasks.add(new Subtask());
 		tasks.add(new Subtask());
-		TaskManager manager = new TaskManager();
-		manager.initManagerTasks(tasks);
+		TaskManager manager = new TaskManager(tasks);
 
 		List<TaskInterface> myTasks = manager.getAllTasks();
 		myTasks.forEach(v -> System.out.println(v));
@@ -60,8 +59,7 @@ public class TestTaskManager {
 		tasks.add(new Subtask());
 		tasks.add(new Subtask());
 		tasks.add(new Subtask());
-		TaskManager manager = new TaskManager();
-		manager.initManagerTasks(tasks);
+		TaskManager manager = new TaskManager(tasks);
 
 		TaskInterface task = new Task("ADD TASK", "ADD TASK");
 		manager.addTask(task);
@@ -84,14 +82,13 @@ public class TestTaskManager {
 		tasks.add(new Subtask());
 		tasks.add(new Subtask());
 		tasks.add(new Subtask());
-		TaskManager manager = new TaskManager();
-		manager.initManagerTasks(tasks);
+		TaskManager manager = new TaskManager(tasks);
 
 		Set<TaskInterface> actual = manager.getAllSetTasks();
 		actual.forEach(v -> System.out.println(v));
 		System.out.println("-*-".repeat(100));
 		int expextedSize = actual.size() - 1;
-		manager.removeTaskById("Epic-8");
+		manager.removeTaskById("Epic-6");
 		actual = manager.getAllSetTasks();
 		actual.forEach(v -> System.out.println(v));
 		System.out.println("_".repeat(100));
@@ -111,10 +108,9 @@ public class TestTaskManager {
 		tasks.add(new Subtask());
 		tasks.add(new Subtask());
 		tasks.add(new Subtask());
-		TaskManager manager = new TaskManager();
-		manager.initManagerTasks(tasks);
+		TaskManager manager = new TaskManager(tasks);
 
-		String id = "Epic-10";
+		String id = "Epic-9";
 		TaskInterface epic = manager.getTaskById(id);
 		System.out.println(epic);
 		System.out.println("_".repeat(100));
@@ -134,8 +130,7 @@ public class TestTaskManager {
 		tasks.add(new Subtask());
 		tasks.add(new Subtask());
 		tasks.add(new Subtask());
-		TaskManager manager = new TaskManager();
-		manager.initManagerTasks(tasks);
+		TaskManager manager = new TaskManager(tasks);
 
 		String id = "Task-11";
 		String newName = "UPDATE";
@@ -161,20 +156,8 @@ public class TestTaskManager {
 		TaskInterface t2 = new Task("task-epic1", "*********");
 		TaskInterface sub1 = new Subtask("subTak", "description - for - change status");
 		TaskInterface sub2 = new Subtask("subtask", "description subtask");
-		List<TaskInterface> tasks = new ArrayList<>();
-		tasks.add(task1);
-		tasks.add(epic1);
-		tasks.add(subtask1);
-		tasks.add(sub1);
-		tasks.add(sub2);
-		tasks.add(task1);
-		tasks.add(sub1);
-		tasks.add(task1);
-		tasks.add(sub1);
-		tasks.add(t1);
-		tasks.add(t2);
+
 		TaskManager manager = new TaskManager();
-		manager.initManagerTasks(tasks);
 
 		manager.addTask(epic1, task1);
 		manager.addTask(epic1, t1);
