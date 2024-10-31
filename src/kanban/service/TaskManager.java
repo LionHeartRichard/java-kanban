@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import kanban.model.TaskInterface;
-import kanban.model.impl.Epic;
-import kanban.model.impl.Subtask;
-import kanban.model.impl.Task;
 import kanban.util.Graph;
 import kanban.util.Status;
 
@@ -149,7 +146,7 @@ public class TaskManager {
 		if (cacheFactory.containsTask(id)) {
 			Set<TaskInterface> result = new HashSet<>();
 			Set<String> tmp = cacheGraph.DFS(id); // получаем все идентификаторы
-			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(id))); // получаем обекты из фабрики
+			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(v))); // получаем обекты из фабрики
 			return result;
 		}
 		return null;
@@ -160,7 +157,7 @@ public class TaskManager {
 		if (cacheFactory.containsTask(id)) {
 			List<TaskInterface> result = new ArrayList<>();
 			List<String> tmp = cacheGraph.BFS(id);
-			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(id)));
+			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(v)));
 			return result;
 		}
 		return null;
@@ -197,55 +194,27 @@ public class TaskManager {
 		return cacheFactory.getListTasksByStatus(status);
 	}
 
-	public boolean changeStatusSubtask(String id) {
-		if (!cacheFactory.containsTask(id))
-			return false;
-		TaskInterface task = cacheFactory.getTaskByIdNotCheckNull(id);
-		if (task instanceof Subtask) {
-			cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
-			return true;
-		}
-		return false;
-	}
-
 	public boolean changeStatusTask(String id) {
 		if (!cacheFactory.containsTask(id))
 			return false;
-		TaskInterface task = cacheFactory.getTaskByIdNotCheckNull(id);
-		if (task instanceof Task) {
-			Set<TaskInterface> subtasks = getQuickSubtasks(id);
-			for (TaskInterface subtask : subtasks) {
-				if (subtask.getStatus() != Status.DONE)
-					return false;
-			}
+		Set<String> subtasks = cacheGraph.DFS(id); // если у задачи нет подзадач вызваем метод изменяющий статус
+													// текущей задачи
+		if (subtasks == null || subtasks.isEmpty()) {
 			cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
 			return true;
 		}
-		return false;
-	}
-
-	// реализовал изменение статуса задач таким образом - что задача должна пройти
-	// все стадии
-	// сначала NEW, потом IN_PROGRESS, затем DONE
-	// поэтому они расчитываются в базовом классе Task
-	// в данном классе также проверяется что все подзадачи имеют соответствующий
-	// статус и только в таком случаее задача верхнего уровня может перейти в
-	// следующий статус
-
-	public boolean changeStatusEpic(String id) {
-		if (!cacheFactory.containsTask(id))
-			return false;
-		TaskInterface epic = cacheFactory.getTaskByIdNotCheckNull(id);
-		if (epic instanceof Epic) {
-			Set<TaskInterface> tasks = getQuickSubtasks(id);
-			for (TaskInterface task : tasks) {
-				if (task.getStatus() != Status.DONE)
-					return false;
-			}
-			cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
-			return true;
+		Status topStatus = cacheFactory.getTaskByIdNotCheckNull(id).getStatus();
+		for (String idSubtask : subtasks) {
+			Status subStatus = cacheFactory.getTaskByIdNotCheckNull(idSubtask).getStatus();
+			// проверяем подзадачи на их
+			// исполнение если все задачи выполнены или находятся в стадии отличной от
+			// задачи верхнего
+			// уровня то мы можем поменять задачу верхнего уровня
+			if (subStatus == Status.NEW || subStatus == topStatus)
+				return false;
 		}
-		return false;
+		cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
+		return true;
 	}
 
 }

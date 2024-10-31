@@ -58,7 +58,6 @@ public class Graph<T> {
 	public List<T> BFS(T topVertex) {
 		if (map.containsKey(topVertex)) {
 			List<T> result = new ArrayList<>();
-			result.add(topVertex);
 			Set<T> cache = map.get(topVertex);
 			result.addAll(cache);
 			LinkedList<T> swap = new LinkedList<T>(cache);
@@ -80,7 +79,6 @@ public class Graph<T> {
 	public Set<T> DFS(T topVertex) {
 		if (map.containsKey(topVertex)) {
 			cacheDFS.clear();
-			cacheDFS.add(topVertex);
 			for (T vertex : map.get(topVertex)) {
 				cacheDFS.add(vertex);
 				traversalDFS(vertex);
