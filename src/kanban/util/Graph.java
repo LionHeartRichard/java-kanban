@@ -21,6 +21,14 @@ public class Graph<T> {
 		this.map = adjacent;
 	}
 
+	public int size() {
+		return map.size();
+	}
+
+	public boolean isEmpty() {
+		return map.isEmpty();
+	}
+
 	public void addVertex(T vertex) {
 		map.put(vertex, new HashSet<T>());
 	}
