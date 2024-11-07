@@ -1,220 +1,42 @@
 package kanban.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 
 import kanban.model.TaskInterface;
-import kanban.util.Graph;
 import kanban.util.Status;
 
-public class TaskManager {
+public interface TaskManager {
 
-	private Graph<String> cacheGraph;
-	// использую для хранения всех взаимоотношений классов имплементирующих
-	// TaskInterface
-	// храню в виде topId -> midleId -> subId -> .. и тд. нет ограничений по
-	// декомпозиции
-	// например Epic -> Task -> Subtask
+	boolean addTask(TaskInterface task);
 
-	private TaskFactory cacheFactory;
-	// содержит все объекты классов имплементирующих TaskIntarface
+	boolean addTask(TaskInterface topTask, TaskInterface task);
 
-	public TaskManager() {
-		cacheFactory = new TaskFactory();
-		cacheGraph = new Graph<String>();
-	}
+	boolean containsTaskById(String id);
 
-	public TaskManager(List<TaskInterface> tasks) {
-		if (tasks == null || tasks.isEmpty()) {
-			cacheFactory = new TaskFactory();
-			cacheGraph = new Graph<String>();
-			return;
-		}
-		cacheFactory = getTaskFactory(tasks);
-		cacheGraph = getGraph();
-	}
+	void removeTasks();
 
-	private TaskFactory getTaskFactory(List<TaskInterface> tasks) {
-		TaskFactory factory = new TaskFactory();
-		tasks.forEach(v -> v.registerMyself(factory));
-		return factory;
-	}
-	// метод использует дизайн паттерн "Registry"
-	// реализованный в TaskFactory,
-	// и который по соглашению должны реализовывать все имплементации TaskIntarface
-	// по сути заношу все объекты в мапу (поле у класса TaskFactory)
+	TaskInterface getTaskById(String id);
 
-	private Graph<String> getGraph() {
-		Graph<String> graph = new Graph<>();
-		cacheFactory.getTasks().forEach(v -> graph.addVertex(v.getId()));
-		return graph;
-	}
-	// добавляю все ИД в качестве ключей мапы
-	// напротив них в качестве значений будет сформирован Set<Strung>
-	// Set - будет потенциально но необязательно содержать идентификаторы подзадач в
-	// будущем
-	// когда будем использовать перегруженный метод addTask
-	// который принимает в качестве параметров TaskInterface topTask, TaskInterface
-	// task
-	// первым агрументом будет задача верхнего уровня
-	// далее передаем задачу ниже по уровню
+	boolean removeTaskById(String id);
 
-	public boolean addTask(TaskInterface task) {
-		if (task == null || cacheFactory.containsTask(task.getId()))
-			return false;
-		task.registerMyself(cacheFactory);
-		cacheGraph.addVertex(task.getId());
-		return true;
-	}
+	Set<TaskInterface> getQuickSubtasks(String id);
 
-	public boolean addTask(TaskInterface topTask, TaskInterface task) {
-		if (topTask != null && task != null) {
-			if (!cacheFactory.containsTask(topTask.getId())) {
-				addTaskNotCheckNull(topTask);
-			}
-			if (!cacheFactory.containsTask(task.getId())) {
-				addTaskNotCheckNull(task);
-			}
-			cacheGraph.addEdgeWithoutCheckNullByKeyMap(topTask.getId(), task.getId());
-			return true;
-		}
-		return false;
-	}
-	// метод который позволяет сразу добавлять задачу и подзадачу
-	// или если они уже добавлены позволяет определить их взаимоотношение
+	List<TaskInterface> getSubtasks(String id);
 
-	public boolean addTask(TaskInterface topTask, Set<TaskInterface> tasks) {
-		if (topTask != null && tasks != null && !tasks.isEmpty()) {
-			addTaskNotCheckNull(topTask);
-			String idTopTask = topTask.getId();
-			for (TaskInterface task : tasks) {
-				addTaskNotCheckNull(task);
-				cacheGraph.addEdgeWithoutCheckNullByKeyMap(idTopTask, task.getId());
-			}
-			return true;
-		}
-		return false;
-	}
+	List<TaskInterface> getAllTasks();
 
-	public boolean addTask(TaskInterface topTask, List<TaskInterface> tasks) {
-		if (topTask != null && tasks != null && !tasks.isEmpty()) {
-			addTaskNotCheckNull(topTask);
-			String idTopTask = topTask.getId();
-			for (TaskInterface task : tasks) {
-				addTaskNotCheckNull(task);
-				cacheGraph.addEdgeWithoutCheckNullByKeyMap(idTopTask, task.getId());
-			}
-			return true;
-		}
-		return false;
-	}
-	// еще один вариант
-	// метод кпозволяет сразу добавлять задачу и подзадачу, но уже принимает лист
-	// подзадач
+	Set<TaskInterface> getAllSetTasks();
 
-	private void addTaskNotCheckNull(TaskInterface task) { // check - repeat add!!!!!!!!!!
-		task.registerMyself(cacheFactory);
-		cacheGraph.addVertex(task.getId());
-	}
-	// для внутреннего использования добавлен для быстродействия - применяется когда
-	// не нужны проверки на null
+	boolean updateTask(String id, String newName, String newDescription);
 
-	public boolean containsTaskById(String id) {
-		return cacheFactory.containsTask(id);
-	}
+	boolean updateTask(TaskInterface task);
 
-	public void removeTasks() {
-		cacheFactory.removeTasks();
-		cacheGraph.removeVertices();
-	}
+	List<TaskInterface> getListTasksByStatus(Status status);
 
-	public TaskInterface getTaskById(String id) {
-		return cacheFactory.getTaskById(id);
-	}
+	boolean changeStatusTask(String id);
 
-	public boolean removeTaskById(String id) {
-		if (!cacheFactory.containsTask(id))
-			return false;
-		cacheFactory.removeTaskById(id);
-		cacheGraph.removeVertex(id);
-		return true;
-	}
-
-	public Set<TaskInterface> getQuickSubtasks(String id) {
-		if (cacheFactory.containsTask(id)) {
-			Set<TaskInterface> result = new HashSet<>();
-			Set<String> tmp = cacheGraph.DFS(id); // получаем все идентификаторы
-			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(v))); // получаем обекты из фабрики
-			return result;
-		}
-		return null;
-	}
-	// позволяет получить набор всех подзадач, используя обход в глубину
-
-	public List<TaskInterface> getSubtasks(String id) {
-		if (cacheFactory.containsTask(id)) {
-			List<TaskInterface> result = new ArrayList<>();
-			List<String> tmp = cacheGraph.BFS(id);
-			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(v)));
-			return result;
-		}
-		return null;
-	}
-	// позволяет получить набор всех подзадач, используя обход в ширину
-
-	public List<TaskInterface> getAllTasks() {
-		return cacheFactory.getTasks();
-	}
-
-	public Set<TaskInterface> getAllSetTasks() {
-		return cacheFactory.getSetTasks();
-	}
-
-	public boolean updateTask(String id, String newName, String newDescription) {
-		if (cacheFactory.containsTask(id)) {
-			cacheFactory.getTaskById(id).setName(newName);
-			cacheFactory.getTaskById(id).setDescription(newDescription);
-			return true;
-		}
-		return false;
-	}
-
-	public boolean updateTask(TaskInterface task) {
-		if (cacheFactory.containsTask(task.getId())) {
-			cacheFactory.getTaskById(task.getId()).setName(task.getName());
-			cacheFactory.getTaskById(task.getId()).setDescription(task.getDescription());
-			return true;
-		}
-		return false;
-	}
-
-	public List<TaskInterface> getListTasksByStatus(Status status) {
-		return cacheFactory.getListTasksByStatus(status);
-	}
-
-	public boolean changeStatusTask(String id) {
-		if (!cacheFactory.containsTask(id))
-			return false;
-		Set<String> subtasks = cacheGraph.DFS(id); // если у задачи нет подзадач вызваем метод изменяющий статус
-													// текущей задачи
-		if (subtasks == null || subtasks.isEmpty()) {
-			cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
-			return true;
-		}
-		Status topStatus = cacheFactory.getTaskByIdNotCheckNull(id).getStatus();
-		for (String idSubtask : subtasks) {
-			Status subStatus = cacheFactory.getTaskByIdNotCheckNull(idSubtask).getStatus();
-			// проверяем подзадачи на их
-			// исполнение если все задачи выполнены или находятся в стадии отличной от
-			// задачи верхнего
-			// уровня то мы можем поменять задачу верхнего уровня
-			if (subStatus == Status.NEW || subStatus == topStatus)
-				return false;
-		}
-		cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
-		return true;
-	}
+	Deque<TaskInterface> getHistory();
 
 }
