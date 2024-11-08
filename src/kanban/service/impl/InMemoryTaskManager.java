@@ -5,9 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import kanban.service.Mangers;
 import kanban.model.TaskInterface;
 import kanban.service.HistoryManager;
+import kanban.service.Managers;
 import kanban.service.TaskFactory;
 import kanban.service.TaskManager;
 import kanban.util.Graph;
@@ -24,7 +24,7 @@ public class InMemoryTaskManager implements TaskManager {
 	private TaskFactory cacheFactory;
 	// содержит все объекты классов имплементирующих TaskIntarface
 
-	private HistoryManager history = Mangers.getDefaultHistory();
+	private HistoryManager history = Managers.getDefaultHistory();
 
 	public InMemoryTaskManager() {
 		cacheFactory = new TaskFactory();

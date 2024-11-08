@@ -3,7 +3,7 @@ package kanban.service;
 import kanban.service.impl.InMemoryHistoryManager;
 import kanban.service.impl.InMemoryTaskManager;
 
-public class Mangers {
+public class Managers {
 
 	public static TaskManager getDefault() {
 		return new InMemoryTaskManager();

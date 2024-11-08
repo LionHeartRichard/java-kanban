@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,10 +15,6 @@ import kanban.model.TaskInterface;
 import kanban.model.impl.Epic;
 import kanban.model.impl.Subtask;
 import kanban.model.impl.Task;
-import kanban.service.HistoryManager;
-import kanban.service.Mangers;
-import kanban.service.TaskFactory;
-import kanban.util.Graph;
 import kanban.util.Status;
 
 public class InMemoryTaskManagerTest {
