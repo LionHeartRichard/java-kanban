@@ -1,6 +1,5 @@
 package kanban.service;
 
-import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 
@@ -8,6 +7,10 @@ import kanban.model.TaskInterface;
 import kanban.util.Status;
 
 public interface TaskManager {
+
+	boolean isEmpty();
+
+	int size();
 
 	boolean addTask(TaskInterface task);
 
@@ -21,7 +24,7 @@ public interface TaskManager {
 
 	boolean removeTaskById(String id);
 
-	Set<TaskInterface> getQuickSubtasks(String id);
+	Set<TaskInterface> getSetSubtasks(String id);
 
 	List<TaskInterface> getSubtasks(String id);
 
@@ -37,6 +40,6 @@ public interface TaskManager {
 
 	boolean changeStatusTask(String id);
 
-	Deque<TaskInterface> getHistory();
+	List<TaskInterface> getHistory();
 
 }

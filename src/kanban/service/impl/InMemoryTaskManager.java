@@ -1,13 +1,13 @@
 package kanban.service.impl;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import kanban.service.Mangers;
 import kanban.model.TaskInterface;
+import kanban.service.HistoryManager;
 import kanban.service.TaskFactory;
 import kanban.service.TaskManager;
 import kanban.util.Graph;
@@ -24,9 +24,7 @@ public class InMemoryTaskManager implements TaskManager {
 	private TaskFactory cacheFactory;
 	// содержит все объекты классов имплементирующих TaskIntarface
 
-	private static final int SIZE_HISTORY = 10;
-
-	private Deque<TaskInterface> queHistory = new ArrayDeque<>(SIZE_HISTORY);
+	private HistoryManager history = Mangers.getDefaultHistory();
 
 	public InMemoryTaskManager() {
 		cacheFactory = new TaskFactory();
@@ -69,6 +67,16 @@ public class InMemoryTaskManager implements TaskManager {
 	// далее передаем задачу ниже по уровню
 
 	@Override
+	public boolean isEmpty() {
+		return cacheFactory.isEmpty();
+	}
+
+	@Override
+	public int size() {
+		return cacheFactory.size();
+	}
+
+	@Override
 	public boolean addTask(TaskInterface task) {
 		if (task == null || cacheFactory.containsTask(task.getId()))
 			return false;
@@ -94,32 +102,6 @@ public class InMemoryTaskManager implements TaskManager {
 	// метод который позволяет сразу добавлять задачу и подзадачу
 	// или если они уже добавлены позволяет определить их взаимоотношение
 
-	public boolean addTask(TaskInterface topTask, Set<TaskInterface> tasks) {
-		if (topTask != null && tasks != null && !tasks.isEmpty()) {
-			addTaskNotCheckNull(topTask);
-			String idTopTask = topTask.getId();
-			for (TaskInterface task : tasks) {
-				addTaskNotCheckNull(task);
-				cacheGraph.addEdgeWithoutCheckNullByKeyMap(idTopTask, task.getId());
-			}
-			return true;
-		}
-		return false;
-	}
-
-	public boolean addTask(TaskInterface topTask, List<TaskInterface> tasks) {
-		if (topTask != null && tasks != null && !tasks.isEmpty()) {
-			addTaskNotCheckNull(topTask);
-			String idTopTask = topTask.getId();
-			for (TaskInterface task : tasks) {
-				addTaskNotCheckNull(task);
-				cacheGraph.addEdgeWithoutCheckNullByKeyMap(idTopTask, task.getId());
-			}
-			return true;
-		}
-		return false;
-	}
-
 	private void addTaskNotCheckNull(TaskInterface task) {
 		task.registerMyself(cacheFactory);
 		cacheGraph.addVertex(task.getId());
@@ -141,11 +123,8 @@ public class InMemoryTaskManager implements TaskManager {
 	@Override
 	public TaskInterface getTaskById(String id) {
 		TaskInterface currentTask = cacheFactory.getTaskById(id);
-		if (!queHistory.offer(currentTask)) {
-			queHistory.pop();
-			queHistory.offer(currentTask);
-		}
-		return cacheFactory.getTaskById(id);
+		history.add(currentTask);
+		return currentTask;
 	}
 
 	@Override
@@ -158,7 +137,7 @@ public class InMemoryTaskManager implements TaskManager {
 	}
 
 	@Override
-	public Set<TaskInterface> getQuickSubtasks(String id) {
+	public Set<TaskInterface> getSetSubtasks(String id) {
 		if (cacheFactory.containsTask(id)) {
 			Set<TaskInterface> result = new HashSet<>();
 			Set<String> tmp = cacheGraph.DFS(id); // получаем все идентификаторы
@@ -242,7 +221,7 @@ public class InMemoryTaskManager implements TaskManager {
 	}
 
 	@Override
-	public Deque<TaskInterface> getHistory() {
-		return queHistory;
+	public List<TaskInterface> getHistory() {
+		return history.getHistory();
 	}
 }
