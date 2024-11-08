@@ -10,6 +10,12 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+# set up files
+.project
+.idea
+java-kanban.iml
+.classpath
+
 # Package Files #
 *.jar
 *.war
