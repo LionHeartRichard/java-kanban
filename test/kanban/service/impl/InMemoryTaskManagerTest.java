@@ -25,6 +25,8 @@ import kanban.util.Status;
 
 public class InMemoryTaskManagerTest {
 
+	private Set<TaskInterface> expectedSet;
+
 	private InMemoryTaskManager taskManager;
 
 	private TaskInterface root;
@@ -38,6 +40,7 @@ public class InMemoryTaskManagerTest {
 
 	@BeforeEach
 	public void setUp() {
+		expectedSet = new HashSet<>();
 
 		taskManager = new InMemoryTaskManager();
 
@@ -96,7 +99,8 @@ public class InMemoryTaskManagerTest {
 		taskManager.addTask(root, parentA);
 		taskManager.addTask(root, parentB);
 		taskManager.addTask(parentA, childrenA);
-		taskManager.addTask(parentA, childrenB);
+		taskManager.addTask(childrenA, childrenA1);
+		taskManager.addTask(childrenA, childrenA2);
 		taskManager.addTask(parentB, childrenB);
 
 		TaskInterface expectedTask = parentB;
@@ -110,7 +114,8 @@ public class InMemoryTaskManagerTest {
 		taskManager.addTask(root, parentA);
 		taskManager.addTask(root, parentB);
 		taskManager.addTask(parentA, childrenA);
-		taskManager.addTask(parentA, childrenB);
+		taskManager.addTask(childrenA, childrenA1);
+		taskManager.addTask(childrenA, childrenA2);
 		taskManager.addTask(parentB, childrenB);
 
 		TaskInterface currentTask = childrenA1;
@@ -121,32 +126,119 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void getSetSubtasks() {
+	public void getSetSubtasks_whenAddAllTasks_ReturnSubtasks() {
+		taskManager.addTask(root, parentA);
+		taskManager.addTask(root, parentB);
+		taskManager.addTask(parentA, childrenA);
+		expectedSet.add(childrenA);
+		taskManager.addTask(childrenA, childrenA1);
+		expectedSet.add(childrenA1);
+		taskManager.addTask(childrenA, childrenA2);
+		expectedSet.add(childrenA2);
+		taskManager.addTask(parentB, childrenB);
 
+		TaskInterface topTask = parentA;
+		Set<TaskInterface> actual = taskManager.getSetSubtasks(topTask.getId());
+
+		actual.forEach(v -> assertTrue(expectedSet.contains(v)));
+		assertEquals(expectedSet.size(), actual.size());
 	}
 
 	@Test
-	public void getSubtasks() {
+	public void getSubtasks_whenAddAllTasks_ReturnSubtasks() {
+		taskManager.addTask(root, parentA);
+		taskManager.addTask(root, parentB);
+		taskManager.addTask(parentA, childrenA);
+		expectedSet.add(childrenA);
+		taskManager.addTask(childrenA, childrenA1);
+		expectedSet.add(childrenA1);
+		taskManager.addTask(childrenA, childrenA2);
+		expectedSet.add(childrenA2);
+		taskManager.addTask(parentB, childrenB);
 
+		TaskInterface topTask = parentA;
+		List<TaskInterface> actual = taskManager.getSubtasks(topTask.getId());
+
+		actual.forEach(v -> assertTrue(expectedSet.contains(v)));
+		assertEquals(expectedSet.size(), actual.size());
 	}
 
 	@Test
-	public void updateTask(String id, String newName, String newDescription) {
+	public void updateTask_whenUpdateNameAndDescription_ReturnUpdateTask() {
+		taskManager.addTask(root);
+		String id = root.getId();
+		String newName = "new name = ROOT or super task";
+		String newDescription = "new Description!!!";
 
+		taskManager.updateTask(id, newName, newDescription);
+		TaskInterface actual = taskManager.getTaskById(id);
+
+		assertEquals(newName, actual.getName());
+		assertEquals(newDescription, actual.getDescription());
 	}
 
 	@Test
-	public void updateTask(TaskInterface task) {
+	public void updateTask_whenUpdateTAsk_ReturnUpdateTask() {
+		taskManager.addTask(root);
+		String id = root.getId();
+		String newName = "new name = ROOT or super task";
+		String newDescription = "new Description!!!";
+		root.setName(newName);
+		root.setDescription(newDescription);
 
+		taskManager.updateTask(root);
+		TaskInterface actual = taskManager.getTaskById(id);
+
+		assertEquals(root, actual);
 	}
 
 	@Test
-	public void changeStatusTask() {
+	public void changeStatusTask_whenStatusNotChange_ReturnStatusNEW() {
+		taskManager.addTask(root, childrenA);
+		String id = root.getId();
 
+		taskManager.changeStatusTask(id);
+		root = taskManager.getTaskById(id);
+
+		assertEquals(Status.NEW, root.getStatus());
 	}
 
 	@Test
-	public void getHistory() {
+	public void changeStatusTask_whenChangedStatus_ReturnStatusIN_PROGRESS() {
+		taskManager.addTask(root, parentA);
+		String idTop = root.getId();
+		String idSub = parentA.getId();
+
+		taskManager.changeStatusTask(idSub);
+		taskManager.changeStatusTask(idTop);
+		root = taskManager.getTaskById(idTop);
+
+		assertEquals(Status.IN_PROGRESS, root.getStatus());
+	}
+
+	@Test
+	public void getHistory_whenNotGetTask_ReturnEmpryList() {
+		List<TaskInterface> actual = taskManager.getHistory();
+
+		assertTrue(actual.isEmpty());
+	}
+
+	@Test
+	public void getHistory_whenGetTask_ReturnListHistory() {
+		expectedSet.add(root);
+		expectedSet.add(parentA);
+		expectedSet.add(parentB);
+		taskManager.addTask(root, parentA);
+		taskManager.addTask(root, parentB);
+
+		taskManager.getTaskById(root.getId());
+		taskManager.getTaskById(parentA.getId());
+		taskManager.getTaskById(parentB.getId());
+		taskManager.getTaskById(root.getId());
+		List<TaskInterface> actual = taskManager.getHistory();
+
+		actual.forEach(v -> assertTrue(expectedSet.contains(v)));
+		assertEquals(expectedSet.size(), actual.size());
 	}
 
 }
