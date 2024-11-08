@@ -14,6 +14,14 @@ public class TaskFactory {
 
 	private Map<String, TaskInterface> map = new HashMap<>();
 
+	public int size() {
+		return map.size();
+	}
+
+	public boolean isEmpty() {
+		return map.isEmpty();
+	}
+
 	public void register(String id, TaskInterface task) {
 		map.put(id, task);
 	}

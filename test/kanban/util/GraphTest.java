@@ -24,8 +24,6 @@ public class GraphTest {
 	private String vertexA2;
 	private String vertexB1;
 	private String vertexB2;
-	private Set<String> subVerticesA;
-	private List<String> subVerticesB;
 
 	@BeforeEach
 	public void setUp() {
@@ -34,16 +32,10 @@ public class GraphTest {
 		topVertexA = "A";
 		vertexA1 = "A1";
 		vertexA2 = "A2";
-		subVerticesA = new HashSet<>();
-		subVerticesA.add(vertexA1);
-		subVerticesA.add(vertexA2);
 
 		topVertexB = "B";
 		vertexB1 = "B1";
 		vertexB2 = "B2";
-		subVerticesB = new ArrayList<>();
-		subVerticesB.add(vertexB1);
-		subVerticesB.add(vertexB2);
 	}
 
 	@Test
@@ -56,35 +48,60 @@ public class GraphTest {
 	}
 
 	@Test
-	public void addVertices_whenAddSetSubverticesInGraph() {
-		graph.addVertices(topVertexA, subVerticesA);
-	}
-
-	@Test
-	public void addVetices() {
-
-	}
-
-	@Test
 	public void addEdge_whenEmptyGraphAddTopVertexAndVertex_ReturnSizeForGraph2() {
 		graph.addEdge(topVertexA, vertexA1);
+		Graph<String> newGraph = new Graph<>();
+		newGraph.addEdge(topVertexB, vertexB1, true);
 
 		assertEquals(2, graph.size());
+		assertEquals(2, newGraph.size());
 	}
-//	
-//
-//	public void addEdge(T topVertex, T vertex, boolean bidirectional) {
-//	
-//
-//	public List<T> BFS(T topVertex) {
-//		
-//
-//	public Set<T> DFS(T topVertex) {
 
-//
-//	public void removeVertices() {
-//
-//
-//	public void removeVertex(T vertex) {
+	@Test
+	public void BFS_whenNotEmptyGraph_ReturnListSubverticesInAmount2() {
+		graph.addEdge(topVertexA, vertexA1);
+		graph.addEdge(topVertexA, vertexA2);
+
+		List<String> actual = graph.BFS(topVertexA);
+
+		assertEquals(vertexA1, actual.get(0));
+		assertEquals(vertexA2, actual.get(1));
+		assertEquals(2, actual.size());
+	}
+
+	@Test
+	public void DFS_whenNotEmptyGraph_ReturnSetSubverticesInAmount2() {
+		graph.addEdge(topVertexA, vertexA1);
+		graph.addEdge(topVertexA, vertexA2);
+
+		Set<String> actual = graph.DFS(topVertexA);
+
+		assertTrue(actual.contains(vertexA1));
+		assertTrue(actual.contains(vertexA2));
+		assertEquals(2, actual.size());
+	}
+
+	@Test
+	public void removeVertices_whenGraphNotEmpty_RetunrSize0() {
+		graph.addEdge(topVertexA, vertexA1);
+		graph.addEdge(topVertexB, vertexB1);
+		graph.addEdge(topVertexB, vertexB2);
+		assertFalse(graph.isEmpty());
+
+		graph.removeVertices();
+
+		assertEquals(0, graph.size());
+		assertTrue(graph.isEmpty());
+	}
+
+	@Test
+	public void removeVertex_whenAddTopAndSubvertex_ReturnSize1() {
+		graph.addEdge(topVertexA, vertexA1);
+		assertEquals(2, graph.size());
+
+		graph.removeVertex(vertexA1);
+
+		assertEquals(1, graph.size());
+	}
 
 }

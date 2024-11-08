@@ -33,14 +33,6 @@ public class Graph<T> {
 		map.put(vertex, new HashSet<T>());
 	}
 
-	public void addVertices(T topVertex, Set<T> subVertices) {
-		map.put(topVertex, subVertices);
-	}
-
-	public void addVetices(T topVertex, List<T> subVertices) {
-		map.put(topVertex, new HashSet<T>(subVertices));
-	}
-
 	public void addEdgeWithoutCheckNullByKeyMap(T topVertex, T vertex) {
 		map.get(topVertex).add(vertex);
 	}
