@@ -50,7 +50,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void addTask_whenAddNewTaskInTaskManager_ReturnNewSize() {
+	public void addTaskWhenAddNewTaskInTaskManagerThenReturnNewSize() {
 		int expectedSize = taskManager.size();
 
 		assertTrue(taskManager.addTask(childrenA));
@@ -60,7 +60,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void addTask_whenAddTopAndSubtask_ReturnNewSize() {
+	public void addTaskWhenAddTopAndSubtaskThenReturnNewSize() {
 		int expectedSize = taskManager.size();
 
 		taskManager.addTask(root, parentA);
@@ -70,7 +70,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void containsTaskById_whenAddNewTask_ReturnTrue() {
+	public void containsTaskByIdWhenAddNewTaskThenReturnTrue() {
 		String actualId = parentA.getId();
 
 		taskManager.addTask(parentA);
@@ -79,7 +79,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void removeTasks_whenAdd2TopTasksAnd2Subtasks_ReturnEmptyTaskManager() {
+	public void removeTasksWhenAdd2TopTasksAnd2SubtasksThenReturnEmptyTaskManager() {
 		taskManager.addTask(root, parentB);
 		taskManager.addTask(root, parentA);
 
@@ -89,7 +89,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void getTaskById_whenAddAllTasks_ReturnFindTask() {
+	public void getTaskByIdWhenAddAllTasksThenReturnFindTask() {
 		taskManager.addTask(root, parentA);
 		taskManager.addTask(root, parentB);
 		taskManager.addTask(parentA, childrenA);
@@ -104,7 +104,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void removeTaskById_whenAddAllTasks_ReturnFalseCheckIsContainsCurrentTask() {
+	public void removeTaskByIdWhenAddAllTasksThenReturnFalseCheckIsContainsCurrentTask() {
 		taskManager.addTask(root, parentA);
 		taskManager.addTask(root, parentB);
 		taskManager.addTask(parentA, childrenA);
@@ -120,7 +120,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void getSetSubtasks_whenAddAllTasks_ReturnSubtasks() {
+	public void getSetSubtasksWhenAddAllTasksThenReturnSubtasks() {
 		taskManager.addTask(root, parentA);
 		taskManager.addTask(root, parentB);
 		taskManager.addTask(parentA, childrenA);
@@ -139,7 +139,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void getSubtasks_whenAddAllTasks_ReturnSubtasks() {
+	public void getSubtasksWhenAddAllTasksThenReturnSubtasks() {
 		taskManager.addTask(root, parentA);
 		taskManager.addTask(root, parentB);
 		taskManager.addTask(parentA, childrenA);
@@ -158,7 +158,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void updateTask_whenUpdateNameAndDescription_ReturnUpdateTask() {
+	public void updateTaskWhenUpdateNameAndDescriptionThenReturnUpdateTask() {
 		taskManager.addTask(root);
 		String id = root.getId();
 		String newName = "new name = ROOT or super task";
@@ -172,7 +172,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void updateTask_whenUpdateTAsk_ReturnUpdateTask() {
+	public void updateTaskWhenUpdateTaskThenReturnUpdateTask() {
 		taskManager.addTask(root);
 		String id = root.getId();
 		String newName = "new name = ROOT or super task";
@@ -187,7 +187,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void changeStatusTask_whenStatusNotChange_ReturnStatusNEW() {
+	public void changeStatusTaskWhenStatusNotChangeThenReturnStatusNew() {
 		taskManager.addTask(root, childrenA);
 		String id = root.getId();
 
@@ -198,7 +198,7 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void changeStatusTask_whenChangedStatus_ReturnStatusIN_PROGRESS() {
+	public void changeStatusTaskWhenChangedStatusThenReturnStatusInProgress() {
 		taskManager.addTask(root, parentA);
 		String idTop = root.getId();
 		String idSub = parentA.getId();
@@ -211,14 +211,14 @@ public class InMemoryTaskManagerTest {
 	}
 
 	@Test
-	public void getHistory_whenNotGetTask_ReturnEmpryList() {
+	public void getHistoryWhenNotGetTaskThenReturnEmptyList() {
 		List<TaskInterface> actual = taskManager.getHistory();
 
 		assertTrue(actual.isEmpty());
 	}
 
 	@Test
-	public void getHistory_whenGetTask_ReturnListHistory() {
+	public void getHistoryWhenGetTaskThenReturnListHistory() {
 		expectedSet.add(root);
 		expectedSet.add(parentA);
 		expectedSet.add(parentB);

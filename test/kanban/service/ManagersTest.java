@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test;
 public class ManagersTest {
 
 	@Test
-	public void getDefault_whenCallMethod_ReturnTaskManager() {
+	public void getDefaultWhenCallMethodThenReturnTaskManager() {
 		TaskManager manager = Managers.getDefault();
 
 		assertNotNull(manager);
 	}
 
 	@Test
-	public void getDefaultHistory_whenCallMethod_ReturnHistoryManager() {
+	public void getDefaultHistoryWhenCallMethodThenReturnHistoryManager() {
 		HistoryManager history = Managers.getDefaultHistory();
 
 		assertNotNull(history);

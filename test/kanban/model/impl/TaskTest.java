@@ -16,7 +16,7 @@ public class TaskTest {
 	}
 
 	@Test
-	public void getId_whenCreateNewTask_thenReturnNewId() {
+	public void getIdWhenCreateNewTaskThenReturnNewId() {
 		Task expected = new Task();
 
 		assertNotEquals(expected, actual);
@@ -24,14 +24,14 @@ public class TaskTest {
 	}
 
 	@Test
-	public void getStatus_whenCreateNewTask_thenReturnStatusNEW() {
+	public void getStatusWhenCreateNewTaskThenReturnStatusNEW() {
 		Task expected = new Task();
 
 		assertEquals(expected.getStatus(), actual.getStatus());
 	}
 
 	@Test
-	public void changeStatus_whenCreateNewTask_thenReturnStatusIN_PROGRESS() {
+	public void changeStatusWhenCreateNewTaskThenReturnStatusInProgress() {
 		Task expected = new Task();
 
 		actual.changeStatus();

@@ -10,60 +10,60 @@ import java.util.Set;
 
 public class Graph<T> {
 
-	private Map<T, Set<T>> map = new HashMap<>();
+	private Map<T, Set<T>> graph = new HashMap<>();
 	private Set<T> cacheDFS = new HashSet<>();
 
 	public Graph() {
 	}
 
 	public Graph(Map<T, Set<T>> adjacent) {
-		this.map.clear();
-		this.map = adjacent;
+		this.graph.clear();
+		this.graph = adjacent;
 	}
 
 	public int size() {
-		return map.size();
+		return graph.size();
 	}
 
 	public boolean isEmpty() {
-		return map.isEmpty();
+		return graph.isEmpty();
 	}
 
 	public void addVertex(T vertex) {
-		map.put(vertex, new HashSet<T>());
+		graph.put(vertex, new HashSet<T>());
 	}
 
 	public void addEdgeWithoutCheckNullByKeyMap(T topVertex, T vertex) {
-		map.get(topVertex).add(vertex);
+		graph.get(topVertex).add(vertex);
 	}
 
 	public void addEdge(T topVertex, T vertex) {
-		if (!map.containsKey(topVertex))
+		if (!graph.containsKey(topVertex))
 			addVertex(topVertex);
-		if (!map.containsKey(vertex))
+		if (!graph.containsKey(vertex))
 			addVertex(vertex);
-		map.get(topVertex).add(vertex);
+		graph.get(topVertex).add(vertex);
 	}
 
 	public void addEdge(T topVertex, T vertex, boolean bidirectional) {
-		if (!map.containsKey(topVertex))
+		if (!graph.containsKey(topVertex))
 			addVertex(topVertex);
-		if (!map.containsKey(vertex))
+		if (!graph.containsKey(vertex))
 			addVertex(vertex);
-		map.get(topVertex).add(vertex);
+		graph.get(topVertex).add(vertex);
 		if (bidirectional)
-			map.get(vertex).add(topVertex);
+			graph.get(vertex).add(topVertex);
 	}
 
 	public List<T> BFS(T topVertex) {
-		if (map.containsKey(topVertex)) {
+		if (graph.containsKey(topVertex)) {
 			List<T> result = new ArrayList<>();
-			Set<T> cache = map.get(topVertex);
+			Set<T> cache = graph.get(topVertex);
 			result.addAll(cache);
 			LinkedList<T> swap = new LinkedList<T>(cache);
 			while (!swap.isEmpty()) {
 				T currentVertex = swap.pop();
-				for (T subVertex : map.get(currentVertex)) {
+				for (T subVertex : graph.get(currentVertex)) {
 					if (!cache.contains(subVertex)) {
 						cache.add(subVertex);
 						swap.add(subVertex);
@@ -77,9 +77,9 @@ public class Graph<T> {
 	}
 
 	public Set<T> DFS(T topVertex) {
-		if (map.containsKey(topVertex)) {
+		if (graph.containsKey(topVertex)) {
 			cacheDFS.clear();
-			for (T vertex : map.get(topVertex)) {
+			for (T vertex : graph.get(topVertex)) {
 				cacheDFS.add(vertex);
 				traversalDFS(vertex);
 			}
@@ -89,7 +89,7 @@ public class Graph<T> {
 	}
 
 	private void traversalDFS(T vertex) {
-		Set<T> tmp = map.get(vertex);
+		Set<T> tmp = graph.get(vertex);
 		for (T subVertex : tmp) {
 			cacheDFS.add(subVertex);
 			traversalDFS(subVertex);
@@ -97,21 +97,21 @@ public class Graph<T> {
 	}
 
 	public List<T> getListAllVertices() {
-		List<T> vertices = new ArrayList<T>(map.keySet());
+		List<T> vertices = new ArrayList<T>(graph.keySet());
 		return vertices;
 	}
 
 	public Set<T> getSetAllVertices() {
-		Set<T> vertices = new HashSet<>(map.keySet());
+		Set<T> vertices = new HashSet<>(graph.keySet());
 		return vertices;
 	}
 
 	public void removeVertices() {
-		map.clear();
+		graph.clear();
 	}
 
 	public void removeVertex(T vertex) {
-		map.remove(vertex);
+		graph.remove(vertex);
 	}
 
 }

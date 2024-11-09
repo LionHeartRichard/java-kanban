@@ -22,7 +22,7 @@ public class TaskFactoryTest {
 	}
 
 	@Test
-	public void register_whenTaskFactoryInit_ReturnSize1() {
+	public void registerWhenTaskFactoryInitThenReturnSize1() {
 		assertTrue(factory.isEmpty());
 		task.registerMyself(factory);
 
@@ -30,14 +30,14 @@ public class TaskFactoryTest {
 	}
 
 	@Test
-	public void containsTask_whenTaskFactoryNotEmpty_ReturnTrue() {
+	public void containsTaskWhenTaskFactoryNotEmptyThenReturnTrue() {
 		task.registerMyself(factory);
 
 		assertTrue(factory.containsTask(task.getId()));
 	}
 
 	@Test
-	public void removeTasks_whenRemoveAllTasks_ReturnTrue() {
+	public void removeTasksWhenRemoveAllTasksThenReturnTrue() {
 		task.registerMyself(factory);
 
 		factory.removeTasks();
@@ -46,7 +46,7 @@ public class TaskFactoryTest {
 	}
 
 	@Test
-	public void getTaskById_whenAddTaskInTaskFactory_ReturnTask() {
+	public void getTaskByIdWhenAddTaskInTaskFactoryThenReturnTask() {
 		task.registerMyself(factory);
 
 		TaskInterface actual = factory.getTaskById(task.getId());
@@ -55,7 +55,7 @@ public class TaskFactoryTest {
 	}
 
 	@Test
-	public void removeTaskById_whenTaskFActoryNotEmpty() {
+	public void removeTaskByIdWhenTaskFactoryNotEmptyThenReturnFactory() {
 		task.registerMyself(factory);
 		assertFalse(factory.isEmpty());
 
