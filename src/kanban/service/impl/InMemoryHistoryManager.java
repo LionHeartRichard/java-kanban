@@ -7,23 +7,30 @@ import java.util.Map;
 
 import kanban.model.TaskInterface;
 import kanban.service.HistoryManager;
+import kanban.util.CuctomList;
+import kanban.util.Node;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-	private Map<String, TaskInterface> history;
+	private CuctomList<String, TaskInterface> history;
 
 	public InMemoryHistoryManager() {
-		history = new HashMap<>();
+		history = new CuctomList<>();
 	}
 
 	@Override
 	public void add(TaskInterface task) {
-		history.put(task.getId(), task);
+		history.add(task);
 	}
 
 	@Override
 	public List<TaskInterface> getHistory() {
-		return new ArrayList<>(history.values());
+		return history.getQueue();
+	}
+
+	@Override
+	public void remove(String id) {
+		history.remove(id);
 	}
 
 }
