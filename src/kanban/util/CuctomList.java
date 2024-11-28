@@ -42,7 +42,7 @@ public class CuctomList {
 	public void remove(String id) {
 		Node node = map.get(id);
 		if (node == null)
-			return;// проверь удаление несуществующего элемента
+			return;// проверь удаление несуществующего элемента and emptyMap
 		removeNode(node);
 		map.remove(id);
 	}
@@ -54,14 +54,26 @@ public class CuctomList {
 		final Node previousNode = node.previos;
 		final Node nextNode = node.next;
 		if (previousNode == null && nextNode == null) {
-			head = null;/// ?????!!!!!!!!!
+			head = null;
 			tail = null;
 			return;
 		}
-		if (previousNode != null) {
+		if (previousNode != null && nextNode != null) {
 			previousNode.next = nextNode;
+			nextNode.previos = previousNode;
 			map.put(previousNode.data.getId(), previousNode);
-		} // ---------------------!!!!!!!!!!!!!!!!!!!!!!!
+			map.put(nextNode.data.getId(), nextNode);
+			return;
+		}
+		if (previousNode != null) {
+			previousNode.next = null;
+			tail = previousNode;
+			map.put(tail.data.getId(), tail);
+		} else {
+			nextNode.previos = null;
+			head = nextNode;
+			map.put(head.data.getId(), head);
+		}
 	}
 
 	private void addFirstNode(TaskInterface task) {

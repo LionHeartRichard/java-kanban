@@ -1,21 +1,17 @@
 package kanban.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import kanban.model.TaskInterface;
 import kanban.service.HistoryManager;
 import kanban.util.CuctomList;
-import kanban.util.Node;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-	private CuctomList<String, TaskInterface> history;
+	private CuctomList history;
 
 	public InMemoryHistoryManager() {
-		history = new CuctomList<>();
+		history = new CuctomList();
 	}
 
 	@Override
