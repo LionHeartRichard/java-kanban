@@ -7,13 +7,13 @@ import java.util.Map;
 
 import kanban.model.TaskInterface;
 
-public class CuctomList {
+public class CustomList {
 
 	private Node head;
 	private Node tail;
 	private Map<String, Node> map;
 
-	public CuctomList() {
+	public CustomList() {
 		map = new HashMap<>();
 	}
 
@@ -84,6 +84,7 @@ public class CuctomList {
 	private void addNode(TaskInterface task) {
 		final Node previusNode = tail;
 		final Node nextNode = new Node(previusNode, task, null);
+		tail.next = nextNode;
 		tail = nextNode;
 		if (head.next == null)
 			head.next = tail;
