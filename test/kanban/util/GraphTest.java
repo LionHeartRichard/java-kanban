@@ -62,7 +62,7 @@ public class GraphTest {
 		graph.addEdge(topVertexA, vertexA1);
 		graph.addEdge(topVertexA, vertexA2);
 
-		List<String> actual = graph.BFS(topVertexA);
+		List<String> actual = graph.breadthFirstSearch(topVertexA);
 
 		assertEquals(vertexA1, actual.get(0));
 		assertEquals(vertexA2, actual.get(1));
@@ -74,7 +74,7 @@ public class GraphTest {
 		graph.addEdge(topVertexA, vertexA1);
 		graph.addEdge(topVertexA, vertexA2);
 
-		Set<String> actual = graph.DFS(topVertexA);
+		Set<String> actual = graph.depthFirstSearch(topVertexA);
 
 		assertTrue(actual.contains(vertexA1));
 		assertTrue(actual.contains(vertexA2));

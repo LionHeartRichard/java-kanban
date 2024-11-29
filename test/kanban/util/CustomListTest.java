@@ -3,7 +3,6 @@ package kanban.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,13 +26,14 @@ public class CustomListTest {
 		epic = new Epic();
 		task = new Task();
 		subtask = new Subtask();
+
+		actual.add(epic);
+		actual.add(task);
+		actual.add(subtask);
 	}
 
 	@Test
 	public void add3TaskWhenEmptyHistoryThenReturnSize3() {
-		actual.add(epic);
-		actual.add(task);
-		actual.add(subtask);
 
 		int expectedSizeMap = 3;
 
@@ -42,9 +42,6 @@ public class CustomListTest {
 
 	@Test
 	public void getQueueWhenAddUnique3ElementsThenReturnListSize3() {
-		actual.add(epic);
-		actual.add(task);
-		actual.add(subtask);
 
 		int expectedSizeList = 3;
 		List<TaskInterface> actualList = actual.getQueue();
@@ -52,8 +49,31 @@ public class CustomListTest {
 		assertEquals(expectedSizeList, actualList.size());
 	}
 
-//	public void remove(String id) {
-//
-//	}
+	@Test
+	public void getQueueWhenAddNotUniqueElementsThenReturnListSize3() {
+		actual.add(epic);
+
+		int expectedSizeList = 3;
+		List<TaskInterface> actualList = actual.getQueue();
+		List<TaskInterface> expectedList = new ArrayList<>();
+		expectedList.add(task);
+		expectedList.add(subtask);
+		expectedList.add(epic);
+
+		int idx = 0;
+		assertEquals(expectedSizeList, actualList.size());
+		for (TaskInterface t1 : actualList) {
+			assertEquals(t1, expectedList.get(idx++));
+		}
+	}
+
+	public void removeWhenAdd3TasksRemove1TaskThenReturnSize2() {
+		String id = task.getId();
+
+		actual.remove(id);
+		int expectedSize = 2;
+
+		assertEquals(expectedSize, actual.size());
+	}
 
 }
