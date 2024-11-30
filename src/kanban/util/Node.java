@@ -1,25 +1,22 @@
 package kanban.util;
 
 import java.util.Objects;
-
 import kanban.model.TaskInterface;
 
 class Node {
+	Node previos;
 	TaskInterface data;
 	Node next;
-	Node previos;
-	private String id;
 
-	Node(Node previous, TaskInterface data, Node next) {
+	public Node(Node previusNode, TaskInterface data, Node nextNode) {
+		this.previos = previusNode;
 		this.data = data;
-		this.next = next;
-		this.previos = previous;
-		this.id = data.getId();
+		this.next = nextNode;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id);
+		return Objects.hash(data);
 	}
 
 	@Override
@@ -31,7 +28,7 @@ class Node {
 		if (getClass() != obj.getClass())
 			return false;
 		Node other = (Node) obj;
-		return Objects.equals(id, other.id);
+		return Objects.equals(data, other.data);
 	}
 
 }
