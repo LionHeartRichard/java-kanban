@@ -140,7 +140,7 @@ public class InMemoryTaskManager implements TaskManager {
 	public Set<TaskInterface> getSetSubtasks(String id) {
 		if (cacheFactory.containsTask(id)) {
 			Set<TaskInterface> result = new HashSet<>();
-			Set<String> tmp = cacheGraph.DFS(id); // получаем все идентификаторы
+			Set<String> tmp = cacheGraph.depthFirstSearch(id); // получаем все идентификаторы
 			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(v))); // получаем обекты из фабрики
 			return result;
 		}
@@ -152,7 +152,7 @@ public class InMemoryTaskManager implements TaskManager {
 	public List<TaskInterface> getSubtasks(String id) {
 		if (cacheFactory.containsTask(id)) {
 			List<TaskInterface> result = new ArrayList<>();
-			List<String> tmp = cacheGraph.BFS(id);
+			List<String> tmp = cacheGraph.breadthFirstSearch(id);
 			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(v)));
 			return result;
 		}
@@ -199,8 +199,8 @@ public class InMemoryTaskManager implements TaskManager {
 	public boolean changeStatusTask(String id) {
 		if (!cacheFactory.containsTask(id))
 			return false;
-		Set<String> subtasks = cacheGraph.DFS(id); // если у задачи нет подзадач вызваем метод изменяющий статус
-													// текущей задачи
+		Set<String> subtasks = cacheGraph.depthFirstSearch(id); // если у задачи нет подзадач вызваем метод изменяющий
+																// статус текущей задачи
 		if (subtasks == null || subtasks.isEmpty()) {
 			cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
 			return true;

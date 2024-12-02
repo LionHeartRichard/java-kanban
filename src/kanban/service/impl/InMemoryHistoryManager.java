@@ -1,29 +1,32 @@
 package kanban.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import kanban.model.TaskInterface;
 import kanban.service.HistoryManager;
+import kanban.util.CustomList;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-	private Map<String, TaskInterface> history;
+	private CustomList history;
 
 	public InMemoryHistoryManager() {
-		history = new HashMap<>();
+		history = new CustomList();
 	}
 
 	@Override
 	public void add(TaskInterface task) {
-		history.put(task.getId(), task);
+		history.add(task);
 	}
 
 	@Override
 	public List<TaskInterface> getHistory() {
-		return new ArrayList<>(history.values());
+		return history.getQueue();
+	}
+
+	@Override
+	public void remove(String id) {
+		history.remove(id);
 	}
 
 }

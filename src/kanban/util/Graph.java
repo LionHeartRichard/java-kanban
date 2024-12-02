@@ -55,7 +55,7 @@ public class Graph<T> {
 			graph.get(vertex).add(topVertex);
 	}
 
-	public List<T> BFS(T topVertex) {
+	public List<T> breadthFirstSearch(T topVertex) {
 		if (graph.containsKey(topVertex)) {
 			List<T> result = new ArrayList<>();
 			Set<T> cache = graph.get(topVertex);
@@ -76,7 +76,7 @@ public class Graph<T> {
 		return null;
 	}
 
-	public Set<T> DFS(T topVertex) {
+	public Set<T> depthFirstSearch(T topVertex) {
 		if (graph.containsKey(topVertex)) {
 			cacheDFS.clear();
 			for (T vertex : graph.get(topVertex)) {
