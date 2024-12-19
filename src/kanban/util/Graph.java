@@ -114,4 +114,12 @@ public class Graph<T> {
 		graph.remove(vertex);
 	}
 
+	public Map<T, Set<T>> getGraph() {
+		return graph;
+	}
+
+	public boolean containsKey(T vertex) {
+		return graph.containsKey(vertex);
+	}
+
 }

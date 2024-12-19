@@ -1,8 +1,7 @@
 package kanban.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import kanban.model.TaskInterface;
@@ -14,87 +13,53 @@ import kanban.util.Graph;
 import kanban.util.Status;
 
 public class InMemoryTaskManager implements TaskManager {
-	private Graph<String> cacheGraph;
+	protected Graph<TaskInterface> graph;
 	// использую для хранения всех взаимоотношений классов имплементирующих
 	// TaskInterface
 	// храню в виде topId -> midleId -> subId -> .. и тд. нет ограничений по
 	// декомпозиции
 	// например Epic -> Task -> Subtask
 
-	private TaskFactory cacheFactory;
+	protected TaskFactory factory;
 	// содержит все объекты классов имплементирующих TaskIntarface
+	// реализует паттерн register
 
 	private HistoryManager history = Managers.getDefaultHistory();
 
 	public InMemoryTaskManager() {
-		cacheFactory = new TaskFactory();
-		cacheGraph = new Graph<String>();
+		factory = new TaskFactory();
+		graph = new Graph<>();
 	}
-
-	public InMemoryTaskManager(List<TaskInterface> tasks) {
-		if (tasks == null || tasks.isEmpty()) {
-			cacheFactory = new TaskFactory();
-			cacheGraph = new Graph<String>();
-			return;
-		}
-		cacheFactory = getTaskFactory(tasks);
-		cacheGraph = getGraph();
-	}
-
-	private TaskFactory getTaskFactory(List<TaskInterface> tasks) {
-		TaskFactory factory = new TaskFactory();
-		tasks.forEach(v -> v.registerMyself(factory));
-		return factory;
-	}
-	// метод использует дизайн паттерн "Registry"
-	// реализованный в TaskFactory,
-	// и который по соглашению должны реализовывать все имплементации TaskIntarface
-	// по сути заношу все объекты в мапу (поле у класса TaskFactory)
-
-	private Graph<String> getGraph() {
-		Graph<String> graph = new Graph<>();
-		cacheFactory.getTasks().forEach(v -> graph.addVertex(v.getId()));
-		return graph;
-	}
-	// добавляю все ИД в качестве ключей мапы
-	// напротив них в качестве значений будет сформирован Set<Strung>
-	// Set - будет потенциально но необязательно содержать идентификаторы подзадач в
-	// будущем
-	// когда будем использовать перегруженный метод addTask
-	// который принимает в качестве параметров TaskInterface topTask, TaskInterface
-	// task
-	// первым агрументом будет задача верхнего уровня
-	// далее передаем задачу ниже по уровню
 
 	@Override
 	public boolean isEmpty() {
-		return cacheFactory.isEmpty();
+		return factory.isEmpty();
 	}
 
 	@Override
 	public int size() {
-		return cacheFactory.size();
+		return factory.size();
 	}
 
 	@Override
 	public boolean addTask(TaskInterface task) {
-		if (task == null || cacheFactory.containsTask(task.getId()))
+		if (task == null || factory.containsTask(task.getId()))
 			return false;
-		task.registerMyself(cacheFactory);
-		cacheGraph.addVertex(task.getId());
+		task.registerMyself(factory);
+		graph.addVertex(task);
 		return true;
 	}
 
 	@Override
 	public boolean addTask(TaskInterface topTask, TaskInterface task) {
 		if (topTask != null && task != null) {
-			if (!cacheFactory.containsTask(topTask.getId())) {
+			if (!factory.containsTask(topTask.getId())) {
 				addTaskNotCheckNull(topTask);
 			}
-			if (!cacheFactory.containsTask(task.getId())) {
+			if (!factory.containsTask(task.getId())) {
 				addTaskNotCheckNull(task);
 			}
-			cacheGraph.addEdgeWithoutCheckNullByKeyMap(topTask.getId(), task.getId());
+			graph.addEdgeWithoutCheckNullByKeyMap(topTask, task);
 			return true;
 		}
 		return false;
@@ -103,46 +68,45 @@ public class InMemoryTaskManager implements TaskManager {
 	// или если они уже добавлены позволяет определить их взаимоотношение
 
 	private void addTaskNotCheckNull(TaskInterface task) {
-		task.registerMyself(cacheFactory);
-		cacheGraph.addVertex(task.getId());
+		task.registerMyself(factory);
+		graph.addVertex(task);
 	}
 	// для внутреннего использования добавлен для быстродействия - применяется когда
 	// не нужны проверки на null
 
 	@Override
 	public boolean containsTaskById(String id) {
-		return cacheFactory.containsTask(id);
+		return factory.containsTask(id);
 	}
 
 	@Override
 	public void removeTasks() {
-		cacheFactory.removeTasks();
-		cacheGraph.removeVertices();
+		factory.removeTasks();
+		graph.removeVertices();
 	}
 
 	@Override
 	public TaskInterface getTaskById(String id) {
-		TaskInterface currentTask = cacheFactory.getTaskById(id);
+		TaskInterface currentTask = factory.getTaskById(id);
 		history.add(currentTask);
 		return currentTask;
 	}
 
 	@Override
 	public boolean removeTaskById(String id) {
-		if (!cacheFactory.containsTask(id))
+		if (!factory.containsTask(id))
 			return false;
-		cacheFactory.removeTaskById(id);
-		cacheGraph.removeVertex(id);
+		TaskInterface tmp = factory.getTaskById(id);
+		factory.removeTaskById(id);
+		graph.removeVertex(tmp);
 		return true;
 	}
 
 	@Override
 	public Set<TaskInterface> getSetSubtasks(String id) {
-		if (cacheFactory.containsTask(id)) {
-			Set<TaskInterface> result = new HashSet<>();
-			Set<String> tmp = cacheGraph.depthFirstSearch(id); // получаем все идентификаторы
-			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(v))); // получаем обекты из фабрики
-			return result;
+		if (factory.containsTask(id)) {
+			TaskInterface tmp = factory.getTaskById(id);
+			return graph.depthFirstSearch(tmp);
 		}
 		return null;
 	}
@@ -150,11 +114,9 @@ public class InMemoryTaskManager implements TaskManager {
 
 	@Override
 	public List<TaskInterface> getSubtasks(String id) {
-		if (cacheFactory.containsTask(id)) {
-			List<TaskInterface> result = new ArrayList<>();
-			List<String> tmp = cacheGraph.breadthFirstSearch(id);
-			tmp.forEach(v -> result.add(cacheFactory.getTaskByIdNotCheckNull(v)));
-			return result;
+		if (factory.containsTask(id)) {
+			TaskInterface tmp = factory.getTaskById(id);
+			return graph.breadthFirstSearch(tmp);
 		}
 		return null;
 	}
@@ -162,19 +124,19 @@ public class InMemoryTaskManager implements TaskManager {
 
 	@Override
 	public List<TaskInterface> getAllTasks() {
-		return cacheFactory.getTasks();
+		return factory.getTasks();
 	}
 
 	@Override
 	public Set<TaskInterface> getAllSetTasks() {
-		return cacheFactory.getSetTasks();
+		return factory.getSetTasks();
 	}
 
 	@Override
 	public boolean updateTask(String id, String newName, String newDescription) {
-		if (cacheFactory.containsTask(id)) {
-			cacheFactory.getTaskById(id).setName(newName);
-			cacheFactory.getTaskById(id).setDescription(newDescription);
+		if (factory.containsTask(id)) {
+			factory.getTaskById(id).setName(newName);
+			factory.getTaskById(id).setDescription(newDescription);
 			return true;
 		}
 		return false;
@@ -182,9 +144,9 @@ public class InMemoryTaskManager implements TaskManager {
 
 	@Override
 	public boolean updateTask(TaskInterface task) {
-		if (cacheFactory.containsTask(task.getId())) {
-			cacheFactory.getTaskById(task.getId()).setName(task.getName());
-			cacheFactory.getTaskById(task.getId()).setDescription(task.getDescription());
+		if (factory.containsTask(task.getId())) {
+			factory.getTaskById(task.getId()).setName(task.getName());
+			factory.getTaskById(task.getId()).setDescription(task.getDescription());
 			return true;
 		}
 		return false;
@@ -192,36 +154,42 @@ public class InMemoryTaskManager implements TaskManager {
 
 	@Override
 	public List<TaskInterface> getListTasksByStatus(Status status) {
-		return cacheFactory.getListTasksByStatus(status);
+		return factory.getListTasksByStatus(status);
 	}
 
 	@Override
 	public boolean changeStatusTask(String id) {
-		if (!cacheFactory.containsTask(id))
+		if (!factory.containsTask(id))
 			return false;
-		Set<String> subtasks = cacheGraph.depthFirstSearch(id); // если у задачи нет подзадач вызваем метод изменяющий
-																// статус текущей задачи
+		TaskInterface tmp = factory.getTaskById(id);
+		Set<TaskInterface> subtasks = graph.depthFirstSearch(tmp);
+		// если у задачи нет подзадач вызваем метод изменяющий
+		// статус текущей задачи
 		if (subtasks == null || subtasks.isEmpty()) {
-			cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
+			factory.getTaskByIdNotCheckNull(id).changeStatus();
 			return true;
 		}
 		// проверяем подзадачи на их
 		// исполнение если все задачи выполнены или находятся в стадии отличной от
 		// задачи верхнего
 		// уровня то мы можем поменять задачу верхнего уровня
-		Status topStatus = cacheFactory.getTaskByIdNotCheckNull(id).getStatus();
-		for (String idSubtask : subtasks) {
-			Status subStatus = cacheFactory.getTaskByIdNotCheckNull(idSubtask).getStatus();
+		Status topStatus = factory.getTaskByIdNotCheckNull(id).getStatus();
+		for (TaskInterface subtask : subtasks) {
+			Status subStatus = factory.getTaskByIdNotCheckNull(subtask.getId()).getStatus();
 
 			if (subStatus == Status.NEW || subStatus == topStatus)
 				return false;
 		}
-		cacheFactory.getTaskByIdNotCheckNull(id).changeStatus();
+		factory.getTaskByIdNotCheckNull(id).changeStatus();
 		return true;
 	}
 
 	@Override
 	public List<TaskInterface> getHistory() {
 		return history.getHistory();
+	}
+
+	public Map<TaskInterface, Set<TaskInterface>> getGrap() {
+		return graph.getGraph();
 	}
 }
