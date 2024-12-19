@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Graph<T> {
 
 	private Map<T, Set<T>> graph = new HashMap<>();
@@ -25,6 +27,7 @@ public class Graph<T> {
 		return graph.size();
 	}
 
+	@JsonIgnore
 	public boolean isEmpty() {
 		return graph.isEmpty();
 	}
@@ -96,11 +99,13 @@ public class Graph<T> {
 		}
 	}
 
+	@JsonIgnore
 	public List<T> getListAllVertices() {
 		List<T> vertices = new ArrayList<T>(graph.keySet());
 		return vertices;
 	}
 
+	@JsonIgnore
 	public Set<T> getSetAllVertices() {
 		Set<T> vertices = new HashSet<>(graph.keySet());
 		return vertices;
