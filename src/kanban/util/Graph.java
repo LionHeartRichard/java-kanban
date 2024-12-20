@@ -127,4 +127,7 @@ public class Graph<T> {
 		return graph.containsKey(vertex);
 	}
 
+	public void setGraph(Map<T, Set<T>> graph) {
+		this.graph = graph;
+	}
 }

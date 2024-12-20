@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+
 import kanban.model.TaskInterface;
 import kanban.service.HistoryManager;
 import kanban.service.Managers;
@@ -13,6 +15,8 @@ import kanban.util.Graph;
 import kanban.util.Status;
 
 public class InMemoryTaskManager implements TaskManager {
+
+	@JsonAnyGetter
 	protected Graph<TaskInterface> graph;
 	// использую для хранения всех взаимоотношений классов имплементирующих
 	// TaskInterface

@@ -1,14 +1,24 @@
 package kanban.service.impl;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.cfg.MapperBuilder;
@@ -16,37 +26,42 @@ import com.fasterxml.jackson.databind.cfg.MapperBuilder;
 import kanban.customexception.CreateFileException;
 import kanban.customexception.ManagerSaveException;
 import kanban.customexception.NotFileFindExceptions;
+import kanban.deletethispackage.GraphNotGenerics;
 import kanban.model.TaskInterface;
+import kanban.model.impl.Task;
 import kanban.util.Graph;
+import kanban.util.Status;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-	private String mainFile;
-	private String historyFile;
+	@JsonAnyGetter
 	private static ObjectMapper mapper = new ObjectMapper();
 	private Path mainPath;
-	private Path historyPath;
 
-	public FileBackedTaskManager(final String mainFile, final String historyFile) {
-		this.mainFile = mainFile;
-		this.historyFile = historyFile;
-		this.mainPath = Paths.get(mainFile);
-		this.historyPath = Paths.get(historyFile);
-		if (!Files.exists(mainPath) || !Files.exists(historyPath))
+	public FileBackedTaskManager(final String pathToFile) {
+		this.mainPath = Paths.get(pathToFile);
+		if (!Files.exists(mainPath))
 			throw new NotFileFindExceptions(
-					"При создании объекта FileBackedTaskManager был не верно указан путь к файлу/файлам! ");
+					"При создании объекта FileBackedTaskManager был не верно указан путь к файлу! ");
 	}
 
-	public static FileBackedTaskManager loadFromFile(String mainFile, String historyFile) {
-		FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(mainFile, historyFile);
-		fileBackedTaskManager.graph = loadFileData(mainFile);
+	public static FileBackedTaskManager loadFromFile(String pathToFile) {
+		FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(pathToFile);
+		fileBackedTaskManager.graph = loadData(pathToFile);
 		return fileBackedTaskManager;
 	}
 
-	private static Graph<TaskInterface> loadFileData(String mainFile) {
-		try(FileReader reader =new FileReader(new File(mainFile))){
-		JsonNode current = mapper.readTree(reader);
-		return current;
+	private static Graph<TaskInterface> loadData(String fileName) {
+		try {
+			File file = new File(fileName);
+			Graph<TaskInterface> result = mapper.readValue(file, new TypeReference<Graph<TaskInterface>>() {
+			});
+			return result;
+		} catch (IOException e) {
+			System.err.println("Произошла ошибка во время чтения файла!!! ");
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@Override
@@ -77,11 +92,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 	public void removeTasks() {
 		super.removeTasks();
 		try {
+			Files.delete(mainPath);
 			Files.createFile(mainPath);
 		} catch (IOException e) {
 			throw new CreateFileException(
-					"Возникла ошибка при создании-перезаписи пустого файла во время удаления данных! "
-							+ e.getMessage());
+					"Возникла ошибка при перезаписи файла во время удаления данных! " + e.getMessage());
 		}
 	}
 
@@ -96,6 +111,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 	@Override
 	public boolean updateTask(TaskInterface task) {
 		boolean ans = super.updateTask(task);
+		if (ans)
+			save();
+		return ans;
+	}
+
+	@Override
+	public boolean changeStatusTask(String id) {
+		boolean ans = super.changeStatusTask(id);
 		if (ans)
 			save();
 		return ans;
