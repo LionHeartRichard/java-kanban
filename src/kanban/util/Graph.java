@@ -12,61 +12,61 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Graph<T> {
 
-	private Map<T, Set<T>> graph = new HashMap<>();
+	private Map<T, Set<T>> adjacencyList = new HashMap<>();
 	private Set<T> cacheDFS = new HashSet<>();
 
 	public Graph() {
 	}
 
 	public Graph(Map<T, Set<T>> adjacent) {
-		this.graph.clear();
-		this.graph = adjacent;
+		this.adjacencyList.clear();
+		this.adjacencyList = adjacent;
 	}
 
 	public int size() {
-		return graph.size();
+		return adjacencyList.size();
 	}
 
 	@JsonIgnore
 	public boolean isEmpty() {
-		return graph.isEmpty();
+		return adjacencyList.isEmpty();
 	}
 
 	public void addVertex(T vertex) {
-		graph.put(vertex, new HashSet<T>());
+		adjacencyList.put(vertex, new HashSet<T>());
 	}
 
 	public void addEdgeWithoutCheckNullByKeyMap(T topVertex, T vertex) {
-		graph.get(topVertex).add(vertex);
+		adjacencyList.get(topVertex).add(vertex);
 	}
 
 	public void addEdge(T topVertex, T vertex) {
-		if (!graph.containsKey(topVertex))
+		if (!adjacencyList.containsKey(topVertex))
 			addVertex(topVertex);
-		if (!graph.containsKey(vertex))
+		if (!adjacencyList.containsKey(vertex))
 			addVertex(vertex);
-		graph.get(topVertex).add(vertex);
+		adjacencyList.get(topVertex).add(vertex);
 	}
 
 	public void addEdge(T topVertex, T vertex, boolean bidirectional) {
-		if (!graph.containsKey(topVertex))
+		if (!adjacencyList.containsKey(topVertex))
 			addVertex(topVertex);
-		if (!graph.containsKey(vertex))
+		if (!adjacencyList.containsKey(vertex))
 			addVertex(vertex);
-		graph.get(topVertex).add(vertex);
+		adjacencyList.get(topVertex).add(vertex);
 		if (bidirectional)
-			graph.get(vertex).add(topVertex);
+			adjacencyList.get(vertex).add(topVertex);
 	}
 
 	public List<T> breadthFirstSearch(T topVertex) {
-		if (graph.containsKey(topVertex)) {
+		if (adjacencyList.containsKey(topVertex)) {
 			List<T> result = new ArrayList<>();
-			Set<T> cache = graph.get(topVertex);
+			Set<T> cache = adjacencyList.get(topVertex);
 			result.addAll(cache);
 			LinkedList<T> swap = new LinkedList<T>(cache);
 			while (!swap.isEmpty()) {
 				T currentVertex = swap.pop();
-				for (T subVertex : graph.get(currentVertex)) {
+				for (T subVertex : adjacencyList.get(currentVertex)) {
 					if (!cache.contains(subVertex)) {
 						cache.add(subVertex);
 						swap.add(subVertex);
@@ -80,9 +80,9 @@ public class Graph<T> {
 	}
 
 	public Set<T> depthFirstSearch(T topVertex) {
-		if (graph.containsKey(topVertex)) {
+		if (adjacencyList.containsKey(topVertex)) {
 			cacheDFS.clear();
-			for (T vertex : graph.get(topVertex)) {
+			for (T vertex : adjacencyList.get(topVertex)) {
 				cacheDFS.add(vertex);
 				traversalDFS(vertex);
 			}
@@ -92,7 +92,7 @@ public class Graph<T> {
 	}
 
 	private void traversalDFS(T vertex) {
-		Set<T> tmp = graph.get(vertex);
+		Set<T> tmp = adjacencyList.get(vertex);
 		for (T subVertex : tmp) {
 			cacheDFS.add(subVertex);
 			traversalDFS(subVertex);
@@ -101,33 +101,33 @@ public class Graph<T> {
 
 	@JsonIgnore
 	public List<T> getListAllVertices() {
-		List<T> vertices = new ArrayList<T>(graph.keySet());
+		List<T> vertices = new ArrayList<T>(adjacencyList.keySet());
 		return vertices;
 	}
 
 	@JsonIgnore
 	public Set<T> getSetAllVertices() {
-		Set<T> vertices = new HashSet<>(graph.keySet());
+		Set<T> vertices = new HashSet<>(adjacencyList.keySet());
 		return vertices;
 	}
 
 	public void removeVertices() {
-		graph.clear();
+		adjacencyList.clear();
 	}
 
 	public void removeVertex(T vertex) {
-		graph.remove(vertex);
+		adjacencyList.remove(vertex);
 	}
 
 	public Map<T, Set<T>> getGraph() {
-		return graph;
+		return adjacencyList;
 	}
 
 	public boolean containsKey(T vertex) {
-		return graph.containsKey(vertex);
+		return adjacencyList.containsKey(vertex);
 	}
 
 	public void setGraph(Map<T, Set<T>> graph) {
-		this.graph = graph;
+		this.adjacencyList = graph;
 	}
 }
