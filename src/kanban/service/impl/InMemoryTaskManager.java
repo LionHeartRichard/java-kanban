@@ -1,10 +1,9 @@
 package kanban.service.impl;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import kanban.model.TaskInterface;
 import kanban.service.HistoryManager;
@@ -13,10 +12,13 @@ import kanban.service.TaskFactory;
 import kanban.service.TaskManager;
 import kanban.util.Graph;
 import kanban.util.Status;
+import lombok.Getter;
+import lombok.Setter;
 
 public class InMemoryTaskManager implements TaskManager {
 
-	@JsonAnyGetter
+	@Getter
+	@Setter
 	protected Graph<TaskInterface> graph;
 	// использую для хранения всех взаимоотношений классов имплементирующих
 	// TaskInterface
@@ -24,10 +26,14 @@ public class InMemoryTaskManager implements TaskManager {
 	// декомпозиции
 	// например Epic -> Task -> Subtask
 
+	@JsonIgnore
+	@Getter
+	@Setter
 	protected TaskFactory factory;
 	// содержит все объекты классов имплементирующих TaskIntarface
 	// реализует паттерн register
 
+	@JsonIgnore
 	private HistoryManager history = Managers.getDefaultHistory();
 
 	public InMemoryTaskManager() {
@@ -35,6 +41,11 @@ public class InMemoryTaskManager implements TaskManager {
 		graph = new Graph<>();
 	}
 
+	public InMemoryTaskManager(Graph<TaskInterface> graph) {
+		this.graph = graph;
+	}
+
+	@JsonIgnore
 	@Override
 	public boolean isEmpty() {
 		return factory.isEmpty();
@@ -89,6 +100,7 @@ public class InMemoryTaskManager implements TaskManager {
 		graph.removeVertices();
 	}
 
+	@JsonIgnore
 	@Override
 	public TaskInterface getTaskById(String id) {
 		TaskInterface currentTask = factory.getTaskById(id);
@@ -106,6 +118,7 @@ public class InMemoryTaskManager implements TaskManager {
 		return true;
 	}
 
+	@JsonIgnore
 	@Override
 	public Set<TaskInterface> getSetSubtasks(String id) {
 		if (factory.containsTask(id)) {
@@ -116,6 +129,7 @@ public class InMemoryTaskManager implements TaskManager {
 	}
 	// позволяет получить набор всех подзадач, используя обход в глубину
 
+	@JsonIgnore
 	@Override
 	public List<TaskInterface> getSubtasks(String id) {
 		if (factory.containsTask(id)) {
@@ -126,11 +140,13 @@ public class InMemoryTaskManager implements TaskManager {
 	}
 	// позволяет получить набор всех подзадач, используя обход в ширину
 
+	@JsonIgnore
 	@Override
 	public List<TaskInterface> getAllTasks() {
 		return factory.getTasks();
 	}
 
+	@JsonIgnore
 	@Override
 	public Set<TaskInterface> getAllSetTasks() {
 		return factory.getSetTasks();
@@ -156,6 +172,7 @@ public class InMemoryTaskManager implements TaskManager {
 		return false;
 	}
 
+	@JsonIgnore
 	@Override
 	public List<TaskInterface> getListTasksByStatus(Status status) {
 		return factory.getListTasksByStatus(status);
@@ -188,12 +205,9 @@ public class InMemoryTaskManager implements TaskManager {
 		return true;
 	}
 
+	@JsonIgnore
 	@Override
 	public List<TaskInterface> getHistory() {
 		return history.getHistory();
-	}
-
-	public Map<TaskInterface, Set<TaskInterface>> getGrap() {
-		return graph.getGraph();
 	}
 }

@@ -1,26 +1,38 @@
 package kanban.model.impl;
 
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import kanban.model.TaskInterface;
 import kanban.util.Status;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class Task implements TaskInterface {
 
-	private static final String PREFIX = "Task-";
+	private static final String PREFIX = "T-";
 	private static long count;
 
+	protected String type;
 	protected String id;
 	protected String name;
 	protected String description;
 	protected Status status;
 
 	public Task() {
+		type = "TASK";
 		++count;
 		id = PREFIX + count;
 		status = Status.NEW;
 	}
 
 	public Task(String name, String description) {
+		type = "TASK";
 		++count;
 		id = PREFIX + count;
 		status = Status.NEW;
@@ -28,9 +40,14 @@ public class Task implements TaskInterface {
 		this.description = description;
 	}
 
-	@Override
-	public String getId() {
-		return id;
+	@JsonCreator
+	public Task(@JsonProperty("type") String type, @JsonProperty("id") String id, @JsonProperty("name") String name,
+			@JsonProperty("description") String description, @JsonProperty("status") Status status) {
+		this.type = type;
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.status = status;
 	}
 
 	@Override
@@ -44,37 +61,6 @@ public class Task implements TaskInterface {
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public Status getStatus() {
-		return status;
-	}
-
-	@Override
-	public boolean setName(String name) {
-		if (name == null || name.isEmpty())
-			return false;
-		this.name = name;
-		return true;
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public boolean setDescription(String descrition) {
-		if (descrition == null || descrition.isEmpty())
-			return false;
-		this.description = descrition;
-		return true;
-	}
-
-	@Override
-	public String getDescription() {
-		return description;
 	}
 
 	@Override
@@ -95,8 +81,8 @@ public class Task implements TaskInterface {
 	}
 
 	@Override
+	@JsonValue
 	public String toString() {
-		return "Task [id=" + id + ", name=" + name + ", description=" + description + ", status=" + status + "]";
+		return type + "," + id + "," + name + "," + description + "," + status;
 	}
-
 }

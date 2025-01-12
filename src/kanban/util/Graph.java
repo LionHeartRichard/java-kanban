@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Graph<T> {
@@ -18,6 +20,7 @@ public class Graph<T> {
 	public Graph() {
 	}
 
+	@JsonCreator
 	public Graph(Map<T, Set<T>> adjacent) {
 		this.adjacencyList.clear();
 		this.adjacencyList = adjacent;
@@ -119,15 +122,16 @@ public class Graph<T> {
 		adjacencyList.remove(vertex);
 	}
 
-	public Map<T, Set<T>> getGraph() {
-		return adjacencyList;
-	}
-
 	public boolean containsKey(T vertex) {
 		return adjacencyList.containsKey(vertex);
 	}
 
-	public void setGraph(Map<T, Set<T>> graph) {
-		this.adjacencyList = graph;
+	@JsonAnyGetter
+	public Map<T, Set<T>> getAdjacencyList() {
+		return adjacencyList;
+	}
+
+	public void setAdjacencyList(Map<T, Set<T>> adjacencyList) {
+		this.adjacencyList = adjacencyList;
 	}
 }

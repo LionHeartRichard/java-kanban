@@ -9,18 +9,25 @@ public interface TaskInterface {
 		factory.register(getId(), this);
 	}
 
+	String getType();
+
 	String getId();
-
-	boolean changeStatus();
-
-	Status getStatus();
-
-	boolean setName(String name);
 
 	String getName();
 
-	boolean setDescription(String description);
-
 	String getDescription();
 
+	Status getStatus();
+
+	boolean changeStatus();
+
+	void setType(String type);
+
+	void setId(String id);
+
+	void setName(String name);
+
+	void setDescription(String description);
+
+	void setStatus(Status status);
 }

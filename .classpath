@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="/home/kerrigan_kein/java-lib-jar/jackson-annotations-2.17.2.jar"/>
 	<classpathentry kind="lib" path="/home/kerrigan_kein/java-lib-jar/jackson-core-2.17.2.jar"/>
 	<classpathentry kind="lib" path="/home/kerrigan_kein/java-lib-jar/jackson-databind-2.17.2.jar"/>
+	<classpathentry kind="lib" path="/home/kerrigan_kein/eclipse/jee-2024-06/eclipse/lombok.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

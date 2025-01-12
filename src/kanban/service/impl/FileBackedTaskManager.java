@@ -16,12 +16,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.cfg.MapperBuilder;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import kanban.customexception.CreateFileException;
 import kanban.customexception.ManagerSaveException;
@@ -30,10 +27,12 @@ import kanban.model.TaskInterface;
 import kanban.model.impl.Task;
 import kanban.util.Graph;
 import kanban.util.Status;
+import kanban.parsing.GraphDeserializer;
+import kanban.parsing.TaskInterfaceDeserializer;
+import kanban.parsing.TaskInterfaceKeyDeserializer;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-	@JsonAnyGetter
 	private static ObjectMapper mapper = new ObjectMapper();
 	private Path mainPath;
 
@@ -44,23 +43,59 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 					"При создании объекта FileBackedTaskManager был не верно указан путь к файлу! ");
 	}
 
-	public static FileBackedTaskManager loadFromFile(String pathToFile) {
-		FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(pathToFile);
-		fileBackedTaskManager.graph = loadData(pathToFile);
-		return fileBackedTaskManager;
+	public static FileBackedTaskManager loadFromFile(String pathToFile) throws IOException {
+		FileBackedTaskManager fileTaskManager = new FileBackedTaskManager(pathToFile);
+		InMemoryTaskManager memoryTaskManger = loadData(pathToFile);
+
+		// получаем данные из файла (граф хранит взаимоотношения между задачами)
+		fileTaskManager.graph = memoryTaskManger.graph;
+
+		// настраиваем factory, регистрируем все такски в factory
+		// для того чтобы на выходе получить настроеный объект fileTaskManager
+		for (TaskInterface task : fileTaskManager.graph.getAdjacencyList().keySet()) {
+			task.registerMyself(fileTaskManager.factory);
+		}
+		return fileTaskManager;
 	}
 
-	private static Graph<TaskInterface> loadData(String fileName) {
-		try {
-			File file = new File(fileName);
-			Graph<TaskInterface> result = mapper.readValue(file, new TypeReference<Graph<TaskInterface>>() {
-			});
-			return result;
+	private static InMemoryTaskManager loadData(String pathToFile) throws IOException {
+		try (FileReader reader = new FileReader(pathToFile); BufferedReader buffer = new BufferedReader(reader)) {
+
+			StringBuilder builder = new StringBuilder();
+			String line;
+			while ((line = buffer.readLine()) != null) {
+				builder.append(line);
+			}
+			String json = builder.toString();
+
+			SimpleModule module = new SimpleModule();
+			module.addDeserializer(Graph.class, new GraphDeserializer());
+
+			module.addKeyDeserializer(TaskInterface.class, new TaskInterfaceKeyDeserializer());
+
+			module.addDeserializer(TaskInterface.class, new TaskInterfaceDeserializer());
+
+			mapper.registerModule(module);
+
+			InMemoryTaskManager memoryTaskManager = mapper.readValue(json, InMemoryTaskManager.class);
+			return memoryTaskManager;
 		} catch (IOException e) {
-			System.err.println("Произошла ошибка во время чтения файла!!! ");
 			e.printStackTrace();
+			throw new IOException();
 		}
-		return null;
+	}
+
+	private void save() {
+		try (FileWriter writer = new FileWriter(mainPath.toFile());
+				BufferedWriter buffer = new BufferedWriter(writer)) {
+			InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager(graph);
+			String json = mapper.writeValueAsString(inMemoryTaskManager);
+			buffer.write(json);
+		} catch (JsonProcessingException e) {
+			throw new ManagerSaveException("Ошибка преобразования в JSON. " + e.getMessage());
+		} catch (IOException e) {
+			throw new ManagerSaveException("Ошибка при сохранении в файл. " + e.getMessage());
+		}
 	}
 
 	@Override
@@ -123,15 +158,4 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 		return ans;
 	}
 
-	private void save() {
-		try (FileWriter writer = new FileWriter(mainPath.toFile());
-				BufferedWriter buffer = new BufferedWriter(writer)) {
-			String json = mapper.writeValueAsString(graph);
-			buffer.write(json);
-		} catch (JsonProcessingException e) {
-			throw new ManagerSaveException("Ошибка преобразования в JSON. " + e.getMessage());
-		} catch (IOException e) {
-			throw new ManagerSaveException("Ошибка при сохранении в файл. " + e.getMessage());
-		}
-	}
 }
