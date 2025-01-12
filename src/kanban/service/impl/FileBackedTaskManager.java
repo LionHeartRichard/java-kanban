@@ -27,10 +27,12 @@ import kanban.model.TaskInterface;
 import kanban.model.impl.Task;
 import kanban.util.Graph;
 import kanban.util.Status;
+import lombok.NoArgsConstructor;
 import kanban.parsing.GraphDeserializer;
 import kanban.parsing.TaskInterfaceDeserializer;
 import kanban.parsing.TaskInterfaceKeyDeserializer;
 
+@NoArgsConstructor
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
 	private static ObjectMapper mapper = new ObjectMapper();
