@@ -77,7 +77,7 @@ public class Task implements TaskInterface {
 		if (getClass() != obj.getClass())
 			return false;
 		Task other = (Task) obj;
-		return id == other.id;
+		return id.equals(other.id);
 	}
 
 	@Override
