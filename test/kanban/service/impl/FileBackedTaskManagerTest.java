@@ -63,7 +63,6 @@ public class FileBackedTaskManagerTest {
 				assertTrue(setActual.contains(valueExpected));
 			}
 		}
-
 	}
 
 }
