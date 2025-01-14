@@ -55,7 +55,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void BFSWhenNotEmptyGraphThenReturnListSubverticesInAmount2() {
+	public void BfsWhenNotEmptyGraphThenReturnListSubverticesInAmount2() {
 		graph.addEdge(topVertexA, vertexA1);
 		graph.addEdge(topVertexA, vertexA2);
 
@@ -67,7 +67,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void DFSWhenNotEmptyGraphThenReturnSetSubverticesInAmount2() {
+	public void DfsWhenNotEmptyGraphThenReturnSetSubverticesInAmount2() {
 		graph.addEdge(topVertexA, vertexA1);
 		graph.addEdge(topVertexA, vertexA2);
 
