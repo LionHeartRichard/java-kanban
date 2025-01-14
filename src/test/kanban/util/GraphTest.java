@@ -45,7 +45,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void addEdgeWhenEmptyGraphAddTopVertexAndVertexThenReturnSizeForGraph2() {
+	public void addEdgeWhenEmptyGraphAddTopVertexAndVertexThenReturnSizeForGraph() {
 		graph.addEdge(topVertexA, vertexA1);
 		Graph<String> newGraph = new Graph<>();
 		newGraph.addEdge(topVertexB, vertexB1, true);
@@ -55,7 +55,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void BfsWhenNotEmptyGraphThenReturnListSubverticesInAmount2() {
+	public void BfsWhenNotEmptyGraphThenReturnListSubverticesInAmount() {
 		graph.addEdge(topVertexA, vertexA1);
 		graph.addEdge(topVertexA, vertexA2);
 
@@ -67,7 +67,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void DfsWhenNotEmptyGraphThenReturnSetSubverticesInAmount2() {
+	public void DfsWhenNotEmptyGraphThenReturnSetSubverticesInAmount() {
 		graph.addEdge(topVertexA, vertexA1);
 		graph.addEdge(topVertexA, vertexA2);
 
@@ -79,7 +79,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void removeVerticesWhenGraphNotEmptyThenRetunrSize0() {
+	public void removeVerticesWhenGraphNotEmptyThenRetunrSize() {
 		graph.addEdge(topVertexA, vertexA1);
 		graph.addEdge(topVertexB, vertexB1);
 		graph.addEdge(topVertexB, vertexB2);
@@ -92,7 +92,7 @@ public class GraphTest {
 	}
 
 	@Test
-	public void removeVertexWhenAddTopAndSubvertexThenReturnSize1() {
+	public void removeVertexWhenAddTopAndSubvertexThenReturnSize() {
 		graph.addEdge(topVertexA, vertexA1);
 		assertEquals(2, graph.size());
 
