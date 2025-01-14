@@ -32,8 +32,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 	public FileBackedTaskManager(final String pathToFile) {
 		this.mainPath = Paths.get(pathToFile);
 		if (!Files.exists(mainPath))
-			throw new NotFileFindExceptions(
-					"При создании объекта FileBackedTaskManager был не верно указан путь к файлу! ");
+			throw new NotFileFindExceptions("При запуске приложения был не верно указан путь к файлу! ");
 	}
 
 	public static FileBackedTaskManager loadFromFile(String pathToFile) throws IOException {
