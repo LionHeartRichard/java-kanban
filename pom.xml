@@ -5,7 +5,7 @@
 	<groupId>java-kanban</groupId>
 	<artifactId>java-kanban</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>java-kanban-pet-project</name>
+	<name>java-kanban</name>
 	<description>pet project - YandexPracticum</description>
 
 	<dependencies>
