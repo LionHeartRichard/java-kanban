@@ -17,7 +17,6 @@ java-kanban.iml
 .classpath
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear
