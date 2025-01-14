@@ -1,0 +1,7 @@
+kanban/service/impl/FileBackedTaskManagerTest.class
+kanban/service/ManagersTest.class
+kanban/util/CustomListTest.class
+kanban/service/TaskFactoryTest.class
+kanban/util/GraphTest.class
+kanban/service/impl/InMemoryTaskManagerTest.class
+kanban/model/impl/TaskTest.class
