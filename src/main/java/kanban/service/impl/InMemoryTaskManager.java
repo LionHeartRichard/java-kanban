@@ -1,7 +1,10 @@
 package kanban.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -16,6 +19,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class InMemoryTaskManager implements TaskManager {
+
+	@JsonIgnore
+	@Getter
+	protected Map<LocalDateTime, TaskInterface> prioritizedTasks;
 
 	@Getter
 	@Setter
@@ -39,6 +46,7 @@ public class InMemoryTaskManager implements TaskManager {
 	public InMemoryTaskManager() {
 		factory = new TaskFactory();
 		graph = new Graph<>();
+		prioritizedTasks = new TreeMap<>();
 	}
 
 	public InMemoryTaskManager(Graph<TaskInterface> graph) {
@@ -60,6 +68,9 @@ public class InMemoryTaskManager implements TaskManager {
 	public boolean addTask(TaskInterface task) {
 		if (task == null || factory.containsTask(task.getId()))
 			return false;
+		if (task.getStartTime() != null) {
+			prioritizedTasks.put(task.getStartTime(), task);
+		}
 		task.registerMyself(factory);
 		graph.addVertex(task);
 		return true;

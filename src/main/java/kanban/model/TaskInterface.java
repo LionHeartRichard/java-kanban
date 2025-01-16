@@ -1,5 +1,8 @@
 package kanban.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import kanban.service.TaskFactory;
 import kanban.util.Status;
 
@@ -8,6 +11,10 @@ public interface TaskInterface {
 	default void registerMyself(TaskFactory factory) {
 		factory.register(getId(), this);
 	}
+
+	LocalDateTime getStartTime();
+	
+	Duration getDuration();
 
 	String getType();
 
