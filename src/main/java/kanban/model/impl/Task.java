@@ -1,9 +1,12 @@
 package kanban.model.impl;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import kanban.model.TaskInterface;
@@ -17,12 +20,16 @@ public class Task implements TaskInterface {
 
 	private static final String PREFIX = "T-";
 	private static long count;
+	@JsonIgnore
+	protected static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
 
 	protected String type;
 	protected String id;
 	protected String name;
 	protected String description;
 	protected Status status;
+	protected LocalDateTime startTime;
+	protected Duration duration;
 
 	public Task() {
 		type = "TASK";
@@ -41,13 +48,29 @@ public class Task implements TaskInterface {
 	}
 
 	@JsonCreator
-	public Task(@JsonProperty("type") String type, @JsonProperty("id") String id, @JsonProperty("name") String name,
-			@JsonProperty("description") String description, @JsonProperty("status") Status status) {
+	public Task(String type, String id, String name, String description, Status status) {
 		this.type = type;
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.status = status;
+	}
+
+	@JsonCreator
+	public Task(String type, String id, String name, String description, Status status, String startTime,
+			int duration) {
+		this.type = type;
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.status = status;
+		this.startTime = LocalDateTime.parse(startTime, DATE_TIME_FORMATTER);
+		this.duration = Duration.ofMinutes(duration);
+	}
+
+	@JsonIgnore
+	public LocalDateTime getEndTime() {
+		return startTime.plus(duration);
 	}
 
 	@Override
@@ -83,6 +106,8 @@ public class Task implements TaskInterface {
 	@Override
 	@JsonValue
 	public String toString() {
+		if (startTime != null && duration != null)
+			return type + "," + id + "," + name + "," + description + "," + status + "," + startTime + "," + duration;
 		return type + "," + id + "," + name + "," + description + "," + status;
 	}
 }
