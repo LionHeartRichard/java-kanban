@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import kanban.comparatorscustom.StartTimeTaskComparator;
 import kanban.model.TaskInterface;
 import kanban.service.HistoryManager;
 import kanban.service.Managers;
@@ -20,9 +22,15 @@ import lombok.Setter;
 
 public class InMemoryTaskManager implements TaskManager {
 
+	protected boolean validationByTaskDuration(TaskInterface task, LocalDateTime startTime, LocalDateTime endTime) {
+		if() {
+			
+		}
+	}
+
 	@JsonIgnore
 	@Getter
-	protected Map<LocalDateTime, TaskInterface> prioritizedTasks;
+	protected Set<TaskInterface> prioritizedTasks;
 
 	@Getter
 	@Setter
@@ -46,7 +54,7 @@ public class InMemoryTaskManager implements TaskManager {
 	public InMemoryTaskManager() {
 		factory = new TaskFactory();
 		graph = new Graph<>();
-		prioritizedTasks = new TreeMap<>();
+		prioritizedTasks = new TreeSet<>(new StartTimeTaskComparator());
 	}
 
 	public InMemoryTaskManager(Graph<TaskInterface> graph) {
@@ -68,11 +76,11 @@ public class InMemoryTaskManager implements TaskManager {
 	public boolean addTask(TaskInterface task) {
 		if (task == null || factory.containsTask(task.getId()))
 			return false;
-		if (task.getStartTime() != null) {
-			prioritizedTasks.put(task.getStartTime(), task);
+		if (task.getStartTime() != null && task.getDuration() != null) {
+			prioritizedTasks.stream().;
+			prioritizedTasks.add(task);
 		}
-		task.registerMyself(factory);
-		graph.addVertex(task);
+		addTaskNotCheckNull(task);
 		return true;
 	}
 
@@ -80,9 +88,15 @@ public class InMemoryTaskManager implements TaskManager {
 	public boolean addTask(TaskInterface topTask, TaskInterface task) {
 		if (topTask != null && task != null) {
 			if (!factory.containsTask(topTask.getId())) {
+				if (topTask.getStartTime() != null && topTask.getDuration() != null) {
+					prioritizedTasks.add(topTask);
+				}
 				addTaskNotCheckNull(topTask);
 			}
 			if (!factory.containsTask(task.getId())) {
+				if (task.getStartTime() != null && task.getDuration() != null) {
+					prioritizedTasks.add(task);
+				}
 				addTaskNotCheckNull(task);
 			}
 			graph.addEdgeWithoutCheckNullByKeyMap(topTask, task);
@@ -97,7 +111,8 @@ public class InMemoryTaskManager implements TaskManager {
 		task.registerMyself(factory);
 		graph.addVertex(task);
 	}
-	// для внутреннего использования добавлен для быстродействия - применяется когда
+	// для внутреннего использования добавлен, для быстродействия - применяется
+	// когда
 	// не нужны проверки на null
 
 	@Override
