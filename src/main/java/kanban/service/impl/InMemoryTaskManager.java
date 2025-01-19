@@ -1,10 +1,7 @@
 package kanban.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -54,6 +51,7 @@ public class InMemoryTaskManager implements TaskManager {
 	public InMemoryTaskManager(Graph<TaskInterface> graph) {
 		this.graph = graph;
 	}
+	// этот конструктор используется в кастомной десериализации JSON
 
 	@JsonIgnore
 	@Override
@@ -71,7 +69,8 @@ public class InMemoryTaskManager implements TaskManager {
 		if (task == null || factory.containsTask(task.getId()))
 			return false;
 		if (task.getStartTime() != null && task.getDuration() != null) {
-			prioritizedTasks.stream().;
+			if (prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
+				return false;
 			prioritizedTasks.add(task);
 		}
 		addTaskNotCheckNull(task);
@@ -105,8 +104,8 @@ public class InMemoryTaskManager implements TaskManager {
 		task.registerMyself(factory);
 		graph.addVertex(task);
 	}
-	// для внутреннего использования добавлен, для быстродействия - применяется
-	// когда
+	// для внутреннего использования добавлен,
+	// для быстродействия - применяется когда
 	// не нужны проверки на null
 
 	@Override
@@ -118,6 +117,7 @@ public class InMemoryTaskManager implements TaskManager {
 	public void removeTasks() {
 		factory.removeTasks();
 		graph.removeVertices();
+		prioritizedTasks.clear();
 	}
 
 	@JsonIgnore
@@ -133,6 +133,8 @@ public class InMemoryTaskManager implements TaskManager {
 		if (!factory.containsTask(id))
 			return false;
 		TaskInterface tmp = factory.getTaskById(id);
+		if (prioritizedTasks.contains(tmp))
+			prioritizedTasks.remove(tmp);
 		factory.removeTaskById(id);
 		graph.removeVertex(tmp);
 		return true;
@@ -174,9 +176,11 @@ public class InMemoryTaskManager implements TaskManager {
 
 	@Override
 	public boolean updateTask(String id, String newName, String newDescription) {
-		if (factory.containsTask(id)) {
+		TaskInterface tmp = factory.getTaskById(id);
+		if (tmp != null) {
 			factory.getTaskById(id).setName(newName);
 			factory.getTaskById(id).setDescription(newDescription);
+			graph
 			return true;
 		}
 		return false;

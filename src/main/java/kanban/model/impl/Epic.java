@@ -2,6 +2,7 @@ package kanban.model.impl;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -43,21 +44,24 @@ public class Epic extends Task {
 		this.description = description;
 	}
 
-	public Epic(Graph<TaskInterface> graph) {
-		type = "EPIC";
-		++count;
-		id = PREFIX + count;
-		status = Status.NEW;
-		this.name = name;
-		this.description = description;
-		this.status = status;
-		Set<TaskInterface> priorityTasks = new TreeSet<>(new StartTimeTaskComparator());
-		priorityTasks.addAll(graph.depthFirstSearch(this));
-		priorityTasks.stream().filter()
-//			LocalDateTime start = ;this.startTime = ;
-//			this.duration = ;
-		}
+	public Epic(Graph<TaskInterface> graph, Epic epic) {
+		this.type = epic.type;
+		this.id = epic.id;
+		this.status = epic.status;
+		this.name = epic.name;
+		this.description = epic.description;
+		Set<TaskInterface> priorityTasks = new TreeSet<TaskInterface>(new StartTimeTaskComparator());
 
+		priorityTasks.addAll(graph.depthFirstSearch(epic).stream().filter(t -> t.getStartTime() != null).toList());
+
+		this.duration = Duration.ofMinutes(0);
+
+		Optional.ofNullable(priorityTasks).ifPresent(tasks -> tasks.stream().peek(t -> {
+			if (this.startTime == null)
+				this.startTime = t.getStartTime();
+			this.duration.plusMinutes(t.getDuration().toMinutes());
+			this.endTime = t.getEndTime();
+		}).toList());
 	}
 
 	@JsonCreator
