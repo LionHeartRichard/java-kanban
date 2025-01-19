@@ -2,13 +2,27 @@ package kanban.model.impl;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import kanban.comparatorscustom.StartTimeTaskComparator;
+import kanban.model.TaskInterface;
+import kanban.util.Graph;
 import kanban.util.Status;
 
 public class Epic extends Task {
+
+	private LocalDateTime endTime;
+
+	@Override
+	@JsonIgnore
+	public LocalDateTime getEndTime() {
+		return endTime;
+	}
 
 	private static final String PREFIX = "E-";
 	private static long count;
@@ -27,6 +41,23 @@ public class Epic extends Task {
 		status = Status.NEW;
 		this.name = name;
 		this.description = description;
+	}
+
+	public Epic(Graph<TaskInterface> graph) {
+		type = "EPIC";
+		++count;
+		id = PREFIX + count;
+		status = Status.NEW;
+		this.name = name;
+		this.description = description;
+		this.status = status;
+		Set<TaskInterface> priorityTasks = new TreeSet<>(new StartTimeTaskComparator());
+		priorityTasks.addAll(graph.depthFirstSearch(this));
+		priorityTasks.stream().filter()
+//			LocalDateTime start = ;this.startTime = ;
+//			this.duration = ;
+		}
+
 	}
 
 	@JsonCreator

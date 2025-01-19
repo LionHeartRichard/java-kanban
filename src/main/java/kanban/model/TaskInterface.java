@@ -8,13 +8,25 @@ import kanban.util.Status;
 
 public interface TaskInterface {
 
+	default boolean validDuration(TaskInterface other) {
+		LocalDateTime start = this.getStartTime();
+		LocalDateTime end = this.getEndTime();
+		if (start.isBefore(other.getStartTime()) && end.isAfter(other.getStartTime()))
+			return false;
+		if (start.isBefore(other.getEndTime()) && end.isAfter(other.getEndTime()))
+			return false;
+		return true;
+	}
+
 	default void registerMyself(TaskFactory factory) {
 		factory.register(getId(), this);
 	}
 
 	LocalDateTime getStartTime();
-	
+
 	Duration getDuration();
+
+	LocalDateTime getEndTime();
 
 	String getType();
 

@@ -22,12 +22,6 @@ import lombok.Setter;
 
 public class InMemoryTaskManager implements TaskManager {
 
-	protected boolean validationByTaskDuration(TaskInterface task, LocalDateTime startTime, LocalDateTime endTime) {
-		if() {
-			
-		}
-	}
-
 	@JsonIgnore
 	@Getter
 	protected Set<TaskInterface> prioritizedTasks;

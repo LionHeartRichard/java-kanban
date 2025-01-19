@@ -68,6 +68,7 @@ public class Task implements TaskInterface {
 		this.duration = Duration.ofMinutes(duration);
 	}
 
+	@Override
 	@JsonIgnore
 	public LocalDateTime getEndTime() {
 		return startTime.plus(duration);
