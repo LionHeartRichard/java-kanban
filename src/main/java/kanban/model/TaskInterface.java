@@ -49,4 +49,8 @@ public interface TaskInterface {
 	void setDescription(String description);
 
 	void setStatus(Status status);
+
+	void setStartTime(LocalDateTime startTime);
+
+	void setDuration(Duration duration);
 }

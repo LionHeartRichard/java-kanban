@@ -1,9 +1,6 @@
 package kanban.service.impl;
 
-import java.text.Collator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -25,6 +22,10 @@ public class InMemoryTaskManager implements TaskManager {
 	@JsonIgnore
 	@Getter
 	protected Set<TaskInterface> prioritizedTasks;
+
+	public boolean containsPrioritizedTasks(TaskInterface task) {
+		return prioritizedTasks.contains(task);
+	}
 
 	@Getter
 	@Setter
@@ -72,7 +73,7 @@ public class InMemoryTaskManager implements TaskManager {
 		if (task == null || factory.containsTask(task.getId()))
 			return false;
 		if (task.getStartTime() != null && task.getDuration() != null) {
-			if (prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
+			if (!prioritizedTasks.isEmpty() && prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
 				return false;
 			prioritizedTasks.add(task);
 		}
@@ -85,7 +86,8 @@ public class InMemoryTaskManager implements TaskManager {
 		if (topTask != null && task != null) {
 			if (!factory.containsTask(topTask.getId())) {
 				if (topTask.getStartTime() != null && topTask.getDuration() != null) {
-					if (prioritizedTasks.stream().noneMatch(t -> t.validDuration(topTask)))
+					if (!prioritizedTasks.isEmpty()
+							&& prioritizedTasks.stream().noneMatch(t -> t.validDuration(topTask)))
 						return false;
 					prioritizedTasks.add(topTask);
 				}
@@ -93,7 +95,7 @@ public class InMemoryTaskManager implements TaskManager {
 			}
 			if (!factory.containsTask(task.getId())) {
 				if (task.getStartTime() != null && task.getDuration() != null) {
-					if (prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
+					if (!prioritizedTasks.isEmpty() && prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
 						return false;
 					prioritizedTasks.add(task);
 				}
@@ -140,8 +142,9 @@ public class InMemoryTaskManager implements TaskManager {
 		if (!factory.containsTask(id))
 			return false;
 		TaskInterface tmp = factory.getTaskById(id);
-		if (prioritizedTasks.contains(tmp))
+		if (tmp.getStartTime() != null && prioritizedTasks.contains(tmp)) {
 			prioritizedTasks.remove(tmp);
+		}
 		factory.removeTaskById(id);
 		graph.removeVertex(tmp);
 		return true;
@@ -186,7 +189,7 @@ public class InMemoryTaskManager implements TaskManager {
 		if (factory.update(task)) {
 			graph.update(task);
 			if (task.getStartTime() != null && task.getDuration() != null) {
-				if (prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
+				if (!prioritizedTasks.isEmpty() && prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
 					return false;
 				prioritizedTasks.remove(task);
 				prioritizedTasks.add(task);

@@ -21,7 +21,7 @@ public class Task implements TaskInterface {
 	private static final String PREFIX = "T-";
 	private static long count;
 	@JsonIgnore
-	protected static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
+	protected static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
 
 	protected String type;
 	protected String id;

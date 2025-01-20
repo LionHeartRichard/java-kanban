@@ -4,8 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,17 +19,17 @@ import kanban.model.TaskInterface;
 import kanban.model.impl.Epic;
 import kanban.model.impl.Subtask;
 import kanban.model.impl.Task;
-import kanban.service.impl.InMemoryTaskManager;
 import kanban.util.Status;
 
 public class InMemoryTaskManagerTest {
 
+	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
+
 	private Set<TaskInterface> expectedSet;
 
-	private InMemoryTaskManager taskManager;
+	private InMemoryTaskManager manager;
 
 	private TaskInterface root;
-
 	private TaskInterface parentA;
 	private TaskInterface parentB;
 	private TaskInterface childrenA;
@@ -33,107 +37,108 @@ public class InMemoryTaskManagerTest {
 	private TaskInterface childrenA2;
 	private TaskInterface childrenB;
 
+	private TaskInterface root2;
+	private TaskInterface parentB2;
+	private TaskInterface childrenB2;
+
 	@BeforeEach
 	public void setUp() {
-		expectedSet = new HashSet<>();
-
-		taskManager = new InMemoryTaskManager();
-
+		// инициализирую объекты без полей даты
 		root = new Epic("ROOT", "description ROOT");
-
 		parentA = new Epic("Parent A", "description parent A");
-		childrenA = new Epic("Children A", "description children A");
-		childrenA1 = new Task("Children A1", "description children A1");
-		childrenA2 = new Task("Children A2", "description children A2");
-
+		childrenA = new Task("Children A", "description children A");
+		childrenA1 = new Subtask("Children A1", "description children A1");
+		childrenA2 = new Subtask("Children A2", "description children A2");
 		parentB = new Task("Parent B", "description parent B");
 		childrenB = new Subtask("Children B", "description children B");
+		root2 = new Epic("ROOT2", "Description for ROOT-2");
+
+		// инициализирую объекты с полями даты
+		parentB2 = new Task("Parent B-2", "description parent B-2");
+		parentB2.setStartTime(LocalDateTime.parse("10:00 20.12.2024", DATE_TIME_FORMATTER));
+		parentB2.setDuration(Duration.ofMinutes(60));
+		childrenB2 = new Task("children B-2", "description parent B-2");
+		childrenB2.setStartTime(LocalDateTime.parse("15:00 22.12.2024", DATE_TIME_FORMATTER));
+		childrenB2.setDuration(Duration.ofMinutes(120));
+
+		expectedSet = new HashSet<>();
+		manager = new InMemoryTaskManager();
+
+		// вношу данные для тестов
+		// наполняю данными структуры класса InMemoryTaskManager без дат
+		assertTrue(manager.addTask(root, parentA));
+		assertTrue(manager.addTask(root, parentB));
+		assertTrue(manager.addTask(parentA, childrenA));
+		assertTrue(manager.addTask(childrenA, childrenA1));
+		assertTrue(manager.addTask(childrenA, childrenA2));
+		assertTrue(manager.addTask(parentB, childrenB));
+
+		// наполняю данными структуры класса InMemoryTaskManager с датами
+		assertTrue(manager.addTask(root2, parentB2));
+		assertTrue(manager.addTask(parentB2, childrenB2));
+
+		// ожидаемый набор подзадач для parentA
+		expectedSet.add(childrenA);
+		expectedSet.add(childrenA1);
+		expectedSet.add(childrenA2);
 	}
 
 	@Test
 	public void addTaskWhenAddNewTaskInTaskManagerThenReturnNewSize() {
-		int expectedSize = taskManager.size();
+		int expectedSize = manager.size();
+		TaskInterface newTask = new Task("newTask", "descritptionNewTask");
 
-		assertTrue(taskManager.addTask(childrenA));
+		assertTrue(manager.addTask(newTask));
 		expectedSize += 1;
 
-		assertEquals(expectedSize, taskManager.size());
+		assertEquals(expectedSize, manager.size());
 	}
 
 	@Test
 	public void addTaskWhenAddTopAndSubtaskThenReturnNewSize() {
-		int expectedSize = taskManager.size();
+		int expectedSize = manager.size();
+		TaskInterface newRoot = new Epic("newROOT", "new ROOT Description");
+		TaskInterface newParent = new Task("newParent", "new parent description");
 
-		taskManager.addTask(root, parentA);
+		assertTrue(manager.addTask(newRoot, newParent));
 		expectedSize += 2;
 
-		assertEquals(expectedSize, taskManager.size());
+		assertEquals(expectedSize, manager.size());
 	}
 
 	@Test
 	public void containsTaskByIdWhenAddNewTaskThenReturnTrue() {
-		String actualId = parentA.getId();
+		TaskInterface containsTask = new Subtask();
 
-		taskManager.addTask(parentA);
+		assertTrue(manager.addTask(containsTask));
 
-		assertTrue(taskManager.containsTaskById(actualId));
+		assertTrue(manager.containsTaskById(containsTask.getId()));
 	}
 
 	@Test
 	public void removeTasksWhenAdd2TopTasksAnd2SubtasksThenReturnEmptyTaskManager() {
-		taskManager.addTask(root, parentB);
-		taskManager.addTask(root, parentA);
+		manager.removeTasks();
 
-		taskManager.removeTasks();
-
-		assertTrue(taskManager.isEmpty());
+		assertTrue(manager.isEmpty());
 	}
 
 	@Test
 	public void getTaskByIdWhenAddAllTasksThenReturnFindTask() {
-		taskManager.addTask(root, parentA);
-		taskManager.addTask(root, parentB);
-		taskManager.addTask(parentA, childrenA);
-		taskManager.addTask(childrenA, childrenA1);
-		taskManager.addTask(childrenA, childrenA2);
-		taskManager.addTask(parentB, childrenB);
-
 		TaskInterface expectedTask = parentB;
-		String actualId = parentB.getId();
 
-		assertEquals(expectedTask, taskManager.getTaskById(actualId));
+		assertEquals(expectedTask, manager.getTaskById(parentB.getId()));
 	}
 
 	@Test
 	public void removeTaskByIdWhenAddAllTasksThenReturnFalseCheckIsContainsCurrentTask() {
-		taskManager.addTask(root, parentA);
-		taskManager.addTask(root, parentB);
-		taskManager.addTask(parentA, childrenA);
-		taskManager.addTask(childrenA, childrenA1);
-		taskManager.addTask(childrenA, childrenA2);
-		taskManager.addTask(parentB, childrenB);
+		manager.removeTaskById(childrenA1.getId());
 
-		TaskInterface currentTask = childrenA1;
-		String actualId = currentTask.getId();
-		taskManager.removeTaskById(actualId);
-
-		assertFalse(taskManager.containsTaskById(actualId));
+		assertFalse(manager.containsTaskById(childrenA1.getId()));
 	}
 
 	@Test
 	public void getSetSubtasksWhenAddAllTasksThenReturnSubtasks() {
-		taskManager.addTask(root, parentA);
-		taskManager.addTask(root, parentB);
-		taskManager.addTask(parentA, childrenA);
-		expectedSet.add(childrenA);
-		taskManager.addTask(childrenA, childrenA1);
-		expectedSet.add(childrenA1);
-		taskManager.addTask(childrenA, childrenA2);
-		expectedSet.add(childrenA2);
-		taskManager.addTask(parentB, childrenB);
-
-		TaskInterface topTask = parentA;
-		Set<TaskInterface> actual = taskManager.getSetSubtasks(topTask.getId());
+		Set<TaskInterface> actual = manager.getSetSubtasks(parentA.getId());
 
 		actual.forEach(v -> assertTrue(expectedSet.contains(v)));
 		assertEquals(expectedSet.size(), actual.size());
@@ -141,96 +146,117 @@ public class InMemoryTaskManagerTest {
 
 	@Test
 	public void getSubtasksWhenAddAllTasksThenReturnSubtasks() {
-		taskManager.addTask(root, parentA);
-		taskManager.addTask(root, parentB);
-		taskManager.addTask(parentA, childrenA);
-		expectedSet.add(childrenA);
-		taskManager.addTask(childrenA, childrenA1);
-		expectedSet.add(childrenA1);
-		taskManager.addTask(childrenA, childrenA2);
-		expectedSet.add(childrenA2);
-		taskManager.addTask(parentB, childrenB);
-
-		TaskInterface topTask = parentA;
-		List<TaskInterface> actual = taskManager.getSubtasks(topTask.getId());
+		List<TaskInterface> actual = manager.getSubtasks(parentA.getId());
 
 		actual.forEach(v -> assertTrue(expectedSet.contains(v)));
 		assertEquals(expectedSet.size(), actual.size());
 	}
 
 	@Test
-	public void updateTaskWhenUpdateNameAndDescriptionThenReturnUpdateTask() {
-		taskManager.addTask(root);
-		String id = root.getId();
-		String newName = "new name = ROOT or super task";
-		String newDescription = "new Description!!!";
+	public void updateTaskWhenUpdateNameAndDescriptionThenUpdatePrioritizedGraphFactory() {
+		// обновляю данные для теста
+		childrenB2.setName("NewName - ChildrenB");
+		childrenB2.setDescription("NewDescription - cheldrenB");
+		childrenB2.setStartTime(LocalDateTime.parse("12:00 01.01.2025", DATE_TIME_FORMATTER));
+		childrenB2.setDuration(Duration.ofMinutes(20));
 
-		taskManager.updateTask(id, newName, newDescription);
-		TaskInterface actual = taskManager.getTaskById(id);
+		parentB2.setName("newParentB2");
+		parentB2.setDescription("------New----Description-------newParentB2");
+		parentB2.setStartTime(LocalDateTime.parse("13:00 01.01.2025", DATE_TIME_FORMATTER));
+		parentB2.setDuration(Duration.ofMinutes(30));
 
-		assertEquals(newName, actual.getName());
-		assertEquals(newDescription, actual.getDescription());
+		root2 = new Epic(manager.getGraph(), (Epic) root2);
+		// тестирую расчет времени выполнения для эпика
+		int expectedDurationEpic = 50;
+		assertEquals(expectedDurationEpic, root2.getDuration().toMinutes());
+		// проверяю поле startTime
+		LocalDateTime expectedStartEpicTime = LocalDateTime.parse("12:00 01.01.2025", DATE_TIME_FORMATTER);
+		assertEquals(expectedStartEpicTime, root2.getStartTime());
+		// проверяю поле endTime
+		LocalDateTime expectedEndEpicTime = LocalDateTime.parse("13:30 01.01.2025", DATE_TIME_FORMATTER);
+		assertEquals(expectedEndEpicTime, root2.getEndTime());
+
+		// вызываю метод обновления для подготовленных данных
+		assertTrue(manager.updateTask(childrenB2));
+		assertTrue(manager.updateTask(parentB2));
+		assertTrue(manager.updateTask(root2));
+
+		// проверяю корректность метода для Factory
+		TaskInterface factoryActualChildrenB2 = manager.getFactory().getTaskById(childrenB2.getId());
+		assertEquals(childrenB2, factoryActualChildrenB2);
+		assertEquals(childrenB2.getName(), factoryActualChildrenB2.getName());
+		assertEquals(childrenB2.getDescription(), factoryActualChildrenB2.getDescription());
+		assertEquals(childrenB2.getStatus(), factoryActualChildrenB2.getStatus());
+		assertEquals(childrenB2.getStartTime(), factoryActualChildrenB2.getStartTime());
+		assertEquals(childrenB2.getDuration(), factoryActualChildrenB2.getDuration());
+		assertEquals(childrenB2.getEndTime(), factoryActualChildrenB2.getEndTime());
+
+		// проверяю корректность метода для PrioritizedTasks
+		assertTrue(manager.containsPrioritizedTasks(childrenB2));
+		assertTrue(manager.containsPrioritizedTasks(parentB2));
+		assertTrue(manager.containsPrioritizedTasks(root2));
+
+		// проверяю корректность метода для Graph
+		assertTrue(manager.getGraph().getAdjacencyList().containsKey(parentB2));
+		Map<TaskInterface, Set<TaskInterface>> adjacent = manager.getGraph().getAdjacencyList();
+		adjacent.forEach((k, v) -> {
+			if (k.getId() == parentB2.getId()) {
+				assertEquals(parentB2.getName(), k.getName());
+				assertEquals(parentB2.getDescription(), k.getDescription());
+				assertEquals(parentB2.getStatus(), k.getStatus());
+				assertEquals(parentB2.getStartTime(), k.getStartTime());
+				assertEquals(parentB2.getDuration(), k.getDuration());
+				assertEquals(parentB2.getEndTime(), k.getEndTime());
+			}
+		});
 	}
 
 	@Test
-	public void updateTaskWhenUpdateTaskThenReturnUpdateTask() {
-		taskManager.addTask(root);
+	public void updateTaskWhenUpdateTaskThenUpdateFactory() {
+		manager.addTask(root);
 		String id = root.getId();
 		String newName = "new name = ROOT or super task";
 		String newDescription = "new Description!!!";
 		root.setName(newName);
 		root.setDescription(newDescription);
 
-		taskManager.updateTask(root);
-		TaskInterface actual = taskManager.getTaskById(id);
+		manager.updateTask(root);
+		TaskInterface actual = manager.getTaskById(id);
 
 		assertEquals(root, actual);
 	}
 
 	@Test
 	public void changeStatusTaskWhenStatusNotChangeThenReturnStatusNew() {
-		taskManager.addTask(root, childrenA);
-		String id = root.getId();
+		manager.changeStatusTask(root.getId());
 
-		taskManager.changeStatusTask(id);
-		root = taskManager.getTaskById(id);
-
-		assertEquals(Status.NEW, root.getStatus());
+		assertEquals(Status.NEW, manager.getTaskById(root.getId()).getStatus());
 	}
 
 	@Test
 	public void changeStatusTaskWhenChangedStatusThenReturnStatusInProgress() {
-		taskManager.addTask(root, parentA);
-		String idTop = root.getId();
-		String idSub = parentA.getId();
+		assertTrue(manager.changeStatusTask(childrenA2.getId()));
+		assertTrue(manager.changeStatusTask(childrenA1.getId()));
+		assertTrue(manager.changeStatusTask(childrenA.getId()));
+		assertTrue(manager.changeStatusTask(parentA.getId()));
 
-		taskManager.changeStatusTask(idSub);
-		taskManager.changeStatusTask(idTop);
-		root = taskManager.getTaskById(idTop);
-
-		assertEquals(Status.IN_PROGRESS, root.getStatus());
+		assertEquals(Status.IN_PROGRESS, manager.getTaskById(parentA.getId()).getStatus());
 	}
 
 	@Test
 	public void getHistoryWhenNotGetTaskThenReturnEmptyList() {
-		List<TaskInterface> actual = taskManager.getHistory();
+		List<TaskInterface> actual = manager.getHistory();
 
 		assertTrue(actual.isEmpty());
 	}
 
 	@Test
 	public void getHistoryWhenGetTaskThenReturnListHistory() {
-		expectedSet.add(root);
-		expectedSet.add(parentA);
-		expectedSet.add(parentB);
-		taskManager.addTask(root, parentA);
-		taskManager.addTask(root, parentB);
+		manager.getTaskById(childrenA.getId());
+		manager.getTaskById(childrenA1.getId());
+		manager.getTaskById(childrenA2.getId());
 
-		taskManager.getTaskById(root.getId());
-		taskManager.getTaskById(parentA.getId());
-		taskManager.getTaskById(parentB.getId());
-		taskManager.getTaskById(root.getId());
-		List<TaskInterface> actual = taskManager.getHistory();
+		List<TaskInterface> actual = manager.getHistory();
 
 		actual.forEach(v -> assertTrue(expectedSet.contains(v)));
 		assertEquals(expectedSet.size(), actual.size());

@@ -59,7 +59,7 @@ public class Epic extends Task {
 		Optional.ofNullable(priorityTasks).ifPresent(tasks -> tasks.stream().peek(t -> {
 			if (this.startTime == null)
 				this.startTime = t.getStartTime();
-			this.duration.plusMinutes(t.getDuration().toMinutes());
+			this.duration = Duration.ofMinutes(this.duration.toMinutes() + t.getDuration().toMinutes());
 			this.endTime = t.getEndTime();
 		}).toList());
 	}
@@ -91,5 +91,12 @@ public class Epic extends Task {
 		if (startTime != null && duration != null)
 			return type + "," + id + "," + name + "," + description + "," + status + "," + startTime + "," + duration;
 		return type + "," + id + "," + name + "," + description + "," + status;
+	}
+
+	@Override
+	public boolean validDuration(TaskInterface other) {
+		if (startTime != null && duration != null && endTime != null)
+			return true;
+		return false;
 	}
 }

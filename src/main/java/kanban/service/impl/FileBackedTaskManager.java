@@ -127,14 +127,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 	}
 
 	@Override
-	public boolean updateTask(String id, String newName, String newDescription) {
-		boolean ans = super.updateTask(id, newName, newDescription);
-		if (ans)
-			save();
-		return ans;
-	}
-
-	@Override
 	public boolean updateTask(TaskInterface task) {
 		boolean ans = super.updateTask(task);
 		if (ans)
