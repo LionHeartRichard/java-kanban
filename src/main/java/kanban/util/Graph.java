@@ -134,4 +134,12 @@ public class Graph<T> {
 	public void setAdjacencyList(Map<T, Set<T>> adjacencyList) {
 		this.adjacencyList = adjacencyList;
 	}
+
+	public boolean update(T vetex) {
+		if (adjacencyList.containsKey(vetex)) {
+			Set<T> swap = adjacencyList.get(vetex);
+			adjacencyList.put(vetex, swap);
+		}
+		return false;
+	}
 }

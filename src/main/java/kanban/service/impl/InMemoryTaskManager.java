@@ -1,6 +1,9 @@
 package kanban.service.impl;
 
+import java.text.Collator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -82,12 +85,16 @@ public class InMemoryTaskManager implements TaskManager {
 		if (topTask != null && task != null) {
 			if (!factory.containsTask(topTask.getId())) {
 				if (topTask.getStartTime() != null && topTask.getDuration() != null) {
+					if (prioritizedTasks.stream().noneMatch(t -> t.validDuration(topTask)))
+						return false;
 					prioritizedTasks.add(topTask);
 				}
 				addTaskNotCheckNull(topTask);
 			}
 			if (!factory.containsTask(task.getId())) {
 				if (task.getStartTime() != null && task.getDuration() != null) {
+					if (prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
+						return false;
 					prioritizedTasks.add(task);
 				}
 				addTaskNotCheckNull(task);
@@ -175,22 +182,15 @@ public class InMemoryTaskManager implements TaskManager {
 	}
 
 	@Override
-	public boolean updateTask(String id, String newName, String newDescription) {
-		TaskInterface tmp = factory.getTaskById(id);
-		if (tmp != null) {
-			factory.getTaskById(id).setName(newName);
-			factory.getTaskById(id).setDescription(newDescription);
-			graph
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public boolean updateTask(TaskInterface task) {
-		if (factory.containsTask(task.getId())) {
-			factory.getTaskById(task.getId()).setName(task.getName());
-			factory.getTaskById(task.getId()).setDescription(task.getDescription());
+		if (factory.update(task)) {
+			graph.update(task);
+			if (task.getStartTime() != null && task.getDuration() != null) {
+				if (prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
+					return false;
+				prioritizedTasks.remove(task);
+				prioritizedTasks.add(task);
+			}
 			return true;
 		}
 		return false;
