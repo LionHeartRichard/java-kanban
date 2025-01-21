@@ -54,7 +54,8 @@ public class Subtask extends Task {
 	@JsonValue
 	public String toString() {
 		if (startTime != null && duration != null)
-			return type + "," + id + "," + name + "," + description + "," + status + "," + startTime + "," + duration;
+			return type + "," + id + "," + name + "," + description + "," + status + ","
+					+ startTime.format(DATE_TIME_FORMATTER) + "," + duration.toMinutes();
 		return type + "," + id + "," + name + "," + description + "," + status;
 	}
 }

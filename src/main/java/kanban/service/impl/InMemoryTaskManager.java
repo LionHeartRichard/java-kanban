@@ -72,39 +72,34 @@ public class InMemoryTaskManager implements TaskManager {
 	public boolean addTask(TaskInterface task) {
 		if (task == null || factory.containsTask(task.getId()))
 			return false;
-		if (task.getStartTime() != null && task.getDuration() != null) {
-			if (!prioritizedTasks.isEmpty() && prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
-				return false;
+		if (isValidDateForTask(task))
 			prioritizedTasks.add(task);
-		}
 		addTaskNotCheckNull(task);
+		return true;
+	}
+
+	private boolean isValidDateForTask(TaskInterface task) {
+		if (task.getStartTime() == null || task.getDuration() == null)
+			return false;
+		if (!prioritizedTasks.isEmpty() && prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
+			return false;
 		return true;
 	}
 
 	@Override
 	public boolean addTask(TaskInterface topTask, TaskInterface task) {
-		if (topTask != null && task != null) {
-			if (!factory.containsTask(topTask.getId())) {
-				if (topTask.getStartTime() != null && topTask.getDuration() != null) {
-					if (!prioritizedTasks.isEmpty()
-							&& prioritizedTasks.stream().noneMatch(t -> t.validDuration(topTask)))
-						return false;
-					prioritizedTasks.add(topTask);
-				}
-				addTaskNotCheckNull(topTask);
-			}
-			if (!factory.containsTask(task.getId())) {
-				if (task.getStartTime() != null && task.getDuration() != null) {
-					if (!prioritizedTasks.isEmpty() && prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
-						return false;
-					prioritizedTasks.add(task);
-				}
-				addTaskNotCheckNull(task);
-			}
-			graph.addEdgeWithoutCheckNullByKeyMap(topTask, task);
-			return true;
-		}
-		return false;
+		if (topTask == null || task == null)
+			return false;
+		if (isValidDateForTask(topTask))
+			prioritizedTasks.add(topTask);
+		if (isValidDateForTask(task))
+			prioritizedTasks.add(task);
+		if (!factory.containsTask(topTask.getId()))
+			addTaskNotCheckNull(topTask);
+		if (!factory.containsTask(task.getId()))
+			addTaskNotCheckNull(task);
+		graph.addEdgeWithoutCheckNullByKeyMap(topTask, task);
+		return true;
 	}
 	// метод который позволяет сразу добавлять задачу и подзадачу
 	// или если они уже добавлены позволяет определить их взаимоотношение
