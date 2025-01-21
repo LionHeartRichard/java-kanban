@@ -26,34 +26,34 @@ public class TaskInterfaceDeserializer extends JsonDeserializer<TaskInterface> {
 		JsonNode node = mapper.readTree(jsonParser);
 
 		String value = node.textValue();
-		String[] filds = value.split(",");
+		String[] fields = value.split(",");
 
-		if (filds.length != 5 && filds.length != 7)
+		if (fields.length != 5 && fields.length != 7)
 			throw new IOException("Invalid value format for TaskInterfaceDeserializer: " + value);
 
-		String type = filds[0];
-		String id = filds[1];
-		String name = filds[2];
-		String description = filds[3];
-		Status status = Status.valueOf(filds[4]);
+		String type = fields[0];
+		String id = fields[1];
+		String name = fields[2];
+		String description = fields[3];
+		Status status = Status.valueOf(fields[4]);
 		String startTime = null;
 		int duration = 0;
 
-		if (filds.length == 7) {
-			startTime = filds[5];
-			duration = Integer.parseInt(filds[6]);
+		if (fields.length == 7) {
+			startTime = fields[5];
+			duration = Integer.parseInt(fields[6]);
 		}
 
 		if ("SUBTASK".equals(type)) {
-			if (filds.length == 7)
+			if (fields.length == 7)
 				return new Subtask(type, id, name, description, status, startTime, duration);
 			return new Subtask(type, id, name, description, status);
 		} else if ("TASK".equals(type)) {
-			if (filds.length == 7)
+			if (fields.length == 7)
 				return new Task(type, id, name, description, status, startTime, duration);
 			return new Task(type, id, name, description, status);
 		} else if ("EPIC".equals(type)) {
-			if (filds.length == 7)
+			if (fields.length == 7)
 				return new Epic(type, id, name, description, status, startTime, duration);
 			return new Epic(type, id, name, description, status);
 		} else {
