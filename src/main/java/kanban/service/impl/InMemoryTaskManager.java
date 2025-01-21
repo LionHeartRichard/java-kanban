@@ -137,7 +137,7 @@ public class InMemoryTaskManager implements TaskManager {
 		if (!factory.containsTask(id))
 			return false;
 		TaskInterface tmp = factory.getTaskById(id);
-		if (tmp.getStartTime() != null && prioritizedTasks.contains(tmp)) {
+		if (isValidDateForTask(tmp) && prioritizedTasks.contains(tmp)) {
 			prioritizedTasks.remove(tmp);
 		}
 		factory.removeTaskById(id);
@@ -181,11 +181,8 @@ public class InMemoryTaskManager implements TaskManager {
 
 	@Override
 	public boolean updateTask(TaskInterface task) {
-		if (factory.update(task)) {
-			graph.update(task);
-			if (task.getStartTime() != null && task.getDuration() != null) {
-				if (!prioritizedTasks.isEmpty() && prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
-					return false;
+		if (factory.update(task) && graph.update(task)) {
+			if (isValidDateForTask(task)) {
 				prioritizedTasks.remove(task);
 				prioritizedTasks.add(task);
 			}

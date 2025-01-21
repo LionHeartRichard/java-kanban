@@ -139,6 +139,7 @@ public class Graph<T> {
 		if (adjacencyList.containsKey(vetex)) {
 			Set<T> swap = adjacencyList.get(vetex);
 			adjacencyList.put(vetex, swap);
+			return true;
 		}
 		return false;
 	}
