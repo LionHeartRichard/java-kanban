@@ -72,4 +72,12 @@ public class TaskFactory {
 		return result;
 	}
 
+	public boolean update(TaskInterface task) {
+		if (mapFactory.containsKey(task.getId())) {
+			mapFactory.put(task.getId(), task);
+			return true;
+		}
+		return false;
+	}
+
 }

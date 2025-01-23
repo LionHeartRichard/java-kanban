@@ -2,9 +2,11 @@ package kanban.service.impl;
 
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import kanban.comparatorscustom.StartTimeTaskComparator;
 import kanban.model.TaskInterface;
 import kanban.service.HistoryManager;
 import kanban.service.Managers;
@@ -16,6 +18,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class InMemoryTaskManager implements TaskManager {
+
+	@JsonIgnore
+	@Getter
+	protected Set<TaskInterface> prioritizedTasks;
+
+	public boolean containsPrioritizedTasks(TaskInterface task) {
+		return prioritizedTasks.contains(task);
+	}
 
 	@Getter
 	@Setter
@@ -39,11 +49,13 @@ public class InMemoryTaskManager implements TaskManager {
 	public InMemoryTaskManager() {
 		factory = new TaskFactory();
 		graph = new Graph<>();
+		prioritizedTasks = new TreeSet<>(new StartTimeTaskComparator());
 	}
 
 	public InMemoryTaskManager(Graph<TaskInterface> graph) {
 		this.graph = graph;
 	}
+	// этот конструктор используется в кастомной десериализации JSON
 
 	@JsonIgnore
 	@Override
@@ -60,24 +72,34 @@ public class InMemoryTaskManager implements TaskManager {
 	public boolean addTask(TaskInterface task) {
 		if (task == null || factory.containsTask(task.getId()))
 			return false;
-		task.registerMyself(factory);
-		graph.addVertex(task);
+		if (isValidDateForTask(task))
+			prioritizedTasks.add(task);
+		addTaskNotCheckNull(task);
+		return true;
+	}
+
+	private boolean isValidDateForTask(TaskInterface task) {
+		if (task.getStartTime() == null || task.getDuration() == null)
+			return false;
+		if (!prioritizedTasks.isEmpty() && prioritizedTasks.stream().noneMatch(t -> t.validDuration(task)))
+			return false;
 		return true;
 	}
 
 	@Override
 	public boolean addTask(TaskInterface topTask, TaskInterface task) {
-		if (topTask != null && task != null) {
-			if (!factory.containsTask(topTask.getId())) {
-				addTaskNotCheckNull(topTask);
-			}
-			if (!factory.containsTask(task.getId())) {
-				addTaskNotCheckNull(task);
-			}
-			graph.addEdgeWithoutCheckNullByKeyMap(topTask, task);
-			return true;
-		}
-		return false;
+		if (topTask == null || task == null)
+			return false;
+		if (isValidDateForTask(topTask))
+			prioritizedTasks.add(topTask);
+		if (isValidDateForTask(task))
+			prioritizedTasks.add(task);
+		if (!factory.containsTask(topTask.getId()))
+			addTaskNotCheckNull(topTask);
+		if (!factory.containsTask(task.getId()))
+			addTaskNotCheckNull(task);
+		graph.addEdgeWithoutCheckNullByKeyMap(topTask, task);
+		return true;
 	}
 	// метод который позволяет сразу добавлять задачу и подзадачу
 	// или если они уже добавлены позволяет определить их взаимоотношение
@@ -86,7 +108,8 @@ public class InMemoryTaskManager implements TaskManager {
 		task.registerMyself(factory);
 		graph.addVertex(task);
 	}
-	// для внутреннего использования добавлен для быстродействия - применяется когда
+	// для внутреннего использования добавлен,
+	// для быстродействия - применяется когда
 	// не нужны проверки на null
 
 	@Override
@@ -98,6 +121,7 @@ public class InMemoryTaskManager implements TaskManager {
 	public void removeTasks() {
 		factory.removeTasks();
 		graph.removeVertices();
+		prioritizedTasks.clear();
 	}
 
 	@JsonIgnore
@@ -113,6 +137,9 @@ public class InMemoryTaskManager implements TaskManager {
 		if (!factory.containsTask(id))
 			return false;
 		TaskInterface tmp = factory.getTaskById(id);
+		if (isValidDateForTask(tmp) && prioritizedTasks.contains(tmp)) {
+			prioritizedTasks.remove(tmp);
+		}
 		factory.removeTaskById(id);
 		graph.removeVertex(tmp);
 		return true;
@@ -153,20 +180,12 @@ public class InMemoryTaskManager implements TaskManager {
 	}
 
 	@Override
-	public boolean updateTask(String id, String newName, String newDescription) {
-		if (factory.containsTask(id)) {
-			factory.getTaskById(id).setName(newName);
-			factory.getTaskById(id).setDescription(newDescription);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public boolean updateTask(TaskInterface task) {
-		if (factory.containsTask(task.getId())) {
-			factory.getTaskById(task.getId()).setName(task.getName());
-			factory.getTaskById(task.getId()).setDescription(task.getDescription());
+		if (factory.update(task) && graph.update(task)) {
+			if (isValidDateForTask(task)) {
+				prioritizedTasks.remove(task);
+				prioritizedTasks.add(task);
+			}
 			return true;
 		}
 		return false;

@@ -32,8 +32,6 @@ public interface TaskManager {
 
 	Set<TaskInterface> getAllSetTasks();
 
-	boolean updateTask(String id, String newName, String newDescription);
-
 	boolean updateTask(TaskInterface task);
 
 	List<TaskInterface> getListTasksByStatus(Status status);
@@ -41,5 +39,7 @@ public interface TaskManager {
 	boolean changeStatusTask(String id);
 
 	List<TaskInterface> getHistory();
+
+	Set<TaskInterface> getPrioritizedTasks();
 
 }

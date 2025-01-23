@@ -18,7 +18,6 @@ public class TaskTest {
 	@Test
 	public void getIdWhenCreateNewTaskThenReturnNewId() {
 		Task expected = new Task();
-
 		assertNotEquals(expected, actual);
 		assertNotEquals(expected.getId(), actual.getId());
 	}
