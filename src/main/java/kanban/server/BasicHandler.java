@@ -32,13 +32,26 @@ public abstract class BasicHandler implements Handler, HttpHandler {
 	@Override
 	public abstract void handle(HttpExchange exchange) throws IOException;
 
-	protected void methodPostUpdate(HttpExchange exchange) throws IOException {
+	protected void methodPost(HttpExchange exchange, boolean isChange) throws IOException {
+
 		String jsonBody = exchange.getRequestBody().toString();
 		SimpleModule module = new SimpleModule();
 		module.addDeserializer(TaskInterface.class, new TaskInterfaceDeserializer());
 		mapper.registerModule(module);
 		TaskInterface response = mapper.readValue(jsonBody, TaskInterface.class);
-		manager.updateTask(response);
-		action(201, exchange, "");
+
+		if (isChange) {
+			if (manager.updateTask(response)) {
+				action(201, exchange, "");
+			} else {
+				action(406, exchange, "");
+			}
+		} else {
+			if (manager.addTask(response)) {
+				action(201, exchange, "");
+			} else {
+				action(406, exchange, "");
+			}
+		}
 	}
 }

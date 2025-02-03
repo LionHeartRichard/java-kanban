@@ -2,11 +2,9 @@ package kanban.server.handlers;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.sun.net.httpserver.HttpExchange;
 
 import kanban.model.TaskInterface;
-import kanban.parsing.TaskInterfaceDeserializer;
 import kanban.server.BasicHandler;
 import kanban.service.TaskManager;
 
@@ -25,7 +23,7 @@ public class TaskByIdHandler extends BasicHandler {
 			if (method.equals("GET")) {
 				methodGet(id, exchange);
 			} else if (method.equals("POST")) {
-				methodPostUpdate(exchange);
+				methodPost(exchange, true);
 			} else if (method.equals("DELETE")) {
 				manager.removeTaskById(id);
 				action(200, exchange, "");
