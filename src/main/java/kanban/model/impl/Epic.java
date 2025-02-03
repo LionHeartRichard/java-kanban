@@ -30,14 +30,14 @@ public class Epic extends Task {
 	private static long count;
 
 	public Epic() {
-		type = "EPIC";
+		type = "epics";
 		++count;
 		id = PREFIX + count;
 		status = Status.NEW;
 	}
 
 	public Epic(String name, String description) {
-		type = "EPIC";
+		type = "epics";
 		++count;
 		id = PREFIX + count;
 		status = Status.NEW;

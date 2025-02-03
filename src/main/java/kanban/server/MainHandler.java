@@ -1,13 +1,28 @@
 package kanban.server;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import kanban.server.handlers.TasksHandler;
+import kanban.server.handlers.TaskByIdHandler;
+import kanban.service.TaskManager;
+import lombok.Getter;
+
+@Getter
 public class MainHandler {
 
-	private static Map<String, Handler> handlers;
+	private Map<String, Handler> handlers;
 
-	static {
-		handlers.put(, new BaseHandler());
+	public MainHandler(TaskManager manager) {
+		handlers = new HashMap<>();
+		
+		handlers.put("/tasks", new TasksHandler(manager));
+		handlers.put("/epics", new TasksHandler(manager));
+		handlers.put("/subtasks", new TasksHandler(manager));
+		
+		handlers.put("/tasks/T", new TaskByIdHandler(manager));
+		handlers.put("/epics/E", new TaskByIdHandler(manager));
+		handlers.put("/subtasks/S", new TaskByIdHandler(manager));
 	}
 
 }

@@ -32,14 +32,14 @@ public class Task implements TaskInterface {
 	protected Duration duration;
 
 	public Task() {
-		type = "TASK";
+		type = "tasks";
 		++count;
 		id = PREFIX + count;
 		status = Status.NEW;
 	}
 
 	public Task(String name, String description) {
-		type = "TASK";
+		type = "tasks";
 		++count;
 		id = PREFIX + count;
 		status = Status.NEW;

@@ -14,14 +14,14 @@ public class Subtask extends Task {
 	private static long count;
 
 	public Subtask() {
-		type = "SUBTASK";
+		type = "subtasks";
 		++count;
 		id = PREFIX + count;
 		status = Status.NEW;
 	}
 
 	public Subtask(String name, String description) {
-		type = "SUBTASK";
+		type = "subtasks";
 		++count;
 		id = PREFIX + count;
 		status = Status.NEW;

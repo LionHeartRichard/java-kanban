@@ -44,15 +44,15 @@ public class TaskInterfaceDeserializer extends JsonDeserializer<TaskInterface> {
 			duration = Integer.parseInt(fields[6]);
 		}
 
-		if ("SUBTASK".equals(type)) {
+		if ("subtasks".equals(type)) {
 			if (fields.length == 7)
 				return new Subtask(type, id, name, description, status, startTime, duration);
 			return new Subtask(type, id, name, description, status);
-		} else if ("TASK".equals(type)) {
+		} else if ("tasks".equals(type)) {
 			if (fields.length == 7)
 				return new Task(type, id, name, description, status, startTime, duration);
 			return new Task(type, id, name, description, status);
-		} else if ("EPIC".equals(type)) {
+		} else if ("epics".equals(type)) {
 			if (fields.length == 7)
 				return new Epic(type, id, name, description, status, startTime, duration);
 			return new Epic(type, id, name, description, status);
