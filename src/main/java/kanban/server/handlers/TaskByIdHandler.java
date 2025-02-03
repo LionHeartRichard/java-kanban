@@ -27,6 +27,8 @@ public class TaskByIdHandler extends BasicHandler {
 			} else if (method.equals("DELETE")) {
 				manager.removeTaskById(id);
 				action(200, exchange, "");
+			} else {
+				action(300, exchange, "Request not supported!!!");
 			}
 		} else {
 			action(404, exchange, "Not found " + uri[2] + " by: " + id);

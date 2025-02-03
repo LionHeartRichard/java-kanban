@@ -22,6 +22,10 @@ public class TasksHandler extends BasicHandler {
 		if (allTasks != null && !allTasks.isEmpty()) {
 			if (exchange.getRequestMethod().equals("GET")) {
 				methodGet(exchange, allTasks);
+			} else if (exchange.getRequestMethod().equals("POST")) {
+				methodPost(exchange, false);
+			} else {
+				action(300, exchange, "Request not supported!!!");
 			}
 		} else if (exchange.getRequestMethod().equals("POST")) {
 			methodPost(exchange, false);

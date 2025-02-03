@@ -18,6 +18,9 @@ public abstract class BasicHandler implements Handler, HttpHandler {
 
 	public BasicHandler(TaskManager manager) {
 		this.manager = manager;
+		SimpleModule module = new SimpleModule();
+		module.addDeserializer(TaskInterface.class, new TaskInterfaceDeserializer());
+		mapper.registerModule(module);
 	}
 
 	@Override
@@ -33,13 +36,8 @@ public abstract class BasicHandler implements Handler, HttpHandler {
 	public abstract void handle(HttpExchange exchange) throws IOException;
 
 	protected void methodPost(HttpExchange exchange, boolean isChange) throws IOException {
-
 		String jsonBody = exchange.getRequestBody().toString();
-		SimpleModule module = new SimpleModule();
-		module.addDeserializer(TaskInterface.class, new TaskInterfaceDeserializer());
-		mapper.registerModule(module);
 		TaskInterface response = mapper.readValue(jsonBody, TaskInterface.class);
-
 		if (isChange) {
 			if (manager.updateTask(response)) {
 				action(201, exchange, "");
