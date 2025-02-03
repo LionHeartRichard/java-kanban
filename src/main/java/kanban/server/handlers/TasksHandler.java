@@ -1,7 +1,6 @@
 package kanban.server.handlers;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,15 +21,20 @@ public class TasksHandler extends BasicHandler {
 		Set<TaskInterface> allTasks = manager.getAllSetTasks();
 		if (allTasks != null && !allTasks.isEmpty()) {
 			if (exchange.getRequestMethod().equals("GET")) {
-				String type = exchange.getRequestURI().toString().split("/")[1];
-				Set<TaskInterface> response = allTasks.stream().filter(t -> t.getType().equals(type))
-						.collect(Collectors.toSet());
-				String jsonBody = mapper.writeValueAsString(response);
-				action(200, exchange, jsonBody);
+				methodGet(exchange, allTasks);
+			} else if (exchange.getRequestMethod().equals("POST")) {
+				methodPostUpdate(exchange);
 			}
 		} else {
 			action(404, exchange, "Not Found");
 		}
 	}
 
+	private void methodGet(HttpExchange exchange, Set<TaskInterface> allTasks) throws IOException {
+		String type = exchange.getRequestURI().toString().split("/")[1];
+		Set<TaskInterface> response = allTasks.stream().filter(t -> t.getType().equals(type))
+				.collect(Collectors.toSet());
+		String jsonBody = mapper.writeValueAsString(response);
+		action(200, exchange, jsonBody);
+	}
 }

@@ -2,10 +2,13 @@ package kanban.server;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import kanban.model.TaskInterface;
+import kanban.parsing.TaskInterfaceDeserializer;
 import kanban.service.TaskManager;
 
 public abstract class BasicHandler implements Handler, HttpHandler {
@@ -28,4 +31,14 @@ public abstract class BasicHandler implements Handler, HttpHandler {
 
 	@Override
 	public abstract void handle(HttpExchange exchange) throws IOException;
+
+	protected void methodPostUpdate(HttpExchange exchange) throws IOException {
+		String jsonBody = exchange.getRequestBody().toString();
+		SimpleModule module = new SimpleModule();
+		module.addDeserializer(TaskInterface.class, new TaskInterfaceDeserializer());
+		mapper.registerModule(module);
+		TaskInterface response = mapper.readValue(jsonBody, TaskInterface.class);
+		manager.updateTask(response);
+		action(201, exchange, "");
+	}
 }

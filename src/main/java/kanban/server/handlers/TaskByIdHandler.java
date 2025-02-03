@@ -22,20 +22,10 @@ public class TaskByIdHandler extends BasicHandler {
 		String id = uri[2];
 		if (manager.containsTaskById(id)) {
 			String method = exchange.getRequestMethod();
-			String jsonBody = "";
-			TaskInterface response;
 			if (method.equals("GET")) {
-				response = manager.getTaskById(id);
-				jsonBody = mapper.writeValueAsString(response);
-				action(200, exchange, jsonBody);
+				methodGet(id, exchange);
 			} else if (method.equals("POST")) {
-				jsonBody = exchange.getRequestBody().toString();
-				SimpleModule module = new SimpleModule();
-				module.addDeserializer(TaskInterface.class, new TaskInterfaceDeserializer());
-				mapper.registerModule(module);
-				response = mapper.readValue(jsonBody, TaskInterface.class);
-				manager.updateTask(response);
-				action(201, exchange, "");
+				methodPostUpdate(exchange);
 			} else if (method.equals("DELETE")) {
 				manager.removeTaskById(id);
 				action(200, exchange, "");
@@ -43,7 +33,11 @@ public class TaskByIdHandler extends BasicHandler {
 		} else {
 			action(404, exchange, "Not found " + uri[2] + " by: " + id);
 		}
-
 	}
 
+	private void methodGet(String id, HttpExchange exchange) throws IOException {
+		TaskInterface response = manager.getTaskById(id);
+		String jsonBody = mapper.writeValueAsString(response);
+		action(200, exchange, jsonBody);
+	}
 }
