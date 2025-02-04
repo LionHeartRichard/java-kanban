@@ -138,6 +138,7 @@ public class Graph<T> {
 	public boolean update(T vetex) {
 		if (adjacencyList.containsKey(vetex)) {
 			Set<T> swap = adjacencyList.get(vetex);
+			adjacencyList.remove(vetex);
 			adjacencyList.put(vetex, swap);
 			return true;
 		}

@@ -11,8 +11,7 @@ public class PostTaskByIdHandlerTest extends SetUpServerForTests {
 	@Test
 	@Override
 	public void test() throws IOException, InterruptedException {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 }
