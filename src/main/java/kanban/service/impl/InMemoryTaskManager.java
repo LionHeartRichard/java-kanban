@@ -181,6 +181,8 @@ public class InMemoryTaskManager implements TaskManager {
 
 	@Override
 	public boolean updateTask(TaskInterface task) {
+		if (task.getStartTime() != null && !isValidDateForTask(task))
+			return false;
 		if (factory.update(task) && graph.update(task)) {
 			if (isValidDateForTask(task)) {
 				prioritizedTasks.remove(task);
