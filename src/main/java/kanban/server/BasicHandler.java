@@ -4,7 +4,10 @@ import com.sun.net.httpserver.HttpHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.sun.net.httpserver.HttpExchange;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import kanban.model.TaskInterface;
@@ -25,10 +28,10 @@ public abstract class BasicHandler implements Handler, HttpHandler {
 
 	@Override
 	public void action(int statusCode, HttpExchange exchange, String jsonBody) throws IOException {
-		byte[] respons = jsonBody.getBytes(StandardCharsets.UTF_8);
+		byte[] response = jsonBody.getBytes(StandardCharsets.UTF_8);
 		exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-		exchange.sendResponseHeaders(statusCode, respons.length);
-		exchange.getResponseBody().write(respons);
+		exchange.sendResponseHeaders(statusCode, response.length);
+		exchange.getResponseBody().write(response);
 		exchange.close();
 	}
 
@@ -36,7 +39,8 @@ public abstract class BasicHandler implements Handler, HttpHandler {
 	public abstract void handle(HttpExchange exchange) throws IOException;
 
 	protected void methodPost(HttpExchange exchange, boolean isChange) throws IOException {
-		String jsonBody = exchange.getRequestBody().toString();
+		InputStream inputStream = exchange.getRequestBody();
+		String jsonBody = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 		TaskInterface response = mapper.readValue(jsonBody, TaskInterface.class);
 		if (isChange) {
 			if (manager.updateTask(response)) {
