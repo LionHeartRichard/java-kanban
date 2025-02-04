@@ -38,11 +38,11 @@ public abstract class BasicHandler implements Handler, HttpHandler {
 	@Override
 	public abstract void handle(HttpExchange exchange) throws IOException;
 
-	protected void methodPost(HttpExchange exchange, boolean isChange) throws IOException {
+	protected void methodPost(HttpExchange exchange, boolean isUpdate) throws IOException {
 		InputStream inputStream = exchange.getRequestBody();
 		String jsonBody = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 		TaskInterface response = mapper.readValue(jsonBody, TaskInterface.class);
-		if (isChange) {
+		if (isUpdate) {
 			if (manager.updateTask(response)) {
 				action(201, exchange, "");
 			} else {
