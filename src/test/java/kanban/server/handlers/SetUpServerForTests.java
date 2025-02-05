@@ -26,6 +26,7 @@ public abstract class SetUpServerForTests {
 
 	protected static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
 
+	private static final String HOST = "http://localhost:8080/";
 	protected TaskManager manager;
 	protected HttpClient client;
 
@@ -48,9 +49,9 @@ public abstract class SetUpServerForTests {
 		TaskServer.stopServer();
 	}
 
-	protected void checkRequest(int typeMethod, int expectedStatusCode, String urlPath, String jsonRequest,
+	protected void checkResponse(int typeMethod, int expectedStatusCode, String urlPath, String jsonRequest,
 			String expectedJson) throws IOException, InterruptedException {
-		URI url = URI.create(urlPath);
+		URI url = URI.create(HOST + urlPath);
 		HttpRequest request;
 		if (typeMethod == 0) {
 			request = HttpRequest.newBuilder().uri(url).header("Accept", "application/json")

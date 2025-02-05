@@ -11,8 +11,22 @@ public class DeleteTaskByIdHandlerTest extends SetUpServerForTests {
 	@Test
 	@Override
 	public void test() throws IOException, InterruptedException {
-		String url = "http://localhost:8080/tasks/T-1";
-		checkRequest(1, 200, url, "", "");
+		String url = "tasks/T-1";
+		checkResponse(1, 200, url, "", "");
+	}
+
+	@DisplayName("DELETE /epics/E-1")
+	@Test
+	public void deleteEpic() throws IOException, InterruptedException {
+		String url = "epics/E-1";
+		checkResponse(1, 200, url, "", "");
+	}
+
+	@DisplayName("DELETE /subtasks/S-1")
+	@Test
+	public void deleteSubtasks() throws IOException, InterruptedException {
+		String url = "subtasks/S-1";
+		checkResponse(1, 200, url, "", "");
 	}
 
 }

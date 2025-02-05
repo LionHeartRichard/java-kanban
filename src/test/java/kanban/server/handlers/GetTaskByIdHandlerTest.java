@@ -11,24 +11,24 @@ public class GetTaskByIdHandlerTest extends SetUpServerForTests {
 	@Test
 	@Override
 	public void test() throws IOException, InterruptedException {
-		String url = "http://localhost:8080/epics/E-1";
+		String url = "epics/E-1";
 		String expectedJson = "\"epics,E-1,EPIC,description EPIC,NEW\"";
-		checkRequest(2, 200, url, "", expectedJson);
+		checkResponse(2, 200, url, "", expectedJson);
 	}
 
 	@DisplayName("GET /tasks/T-1")
 	@Test
 	public void testTasks() throws IOException, InterruptedException {
-		String url = "http://localhost:8080/tasks/T-1";
+		String url = "tasks/T-1";
 		String expectedJson = "\"tasks,T-1,TASK,description TASK,NEW\"";
-		checkRequest(2, 200, url, "", expectedJson);
+		checkResponse(2, 200, url, "", expectedJson);
 	}
 
 	@DisplayName("GET /subtasks/S-1")
 	@Test
 	public void testSubtasks() throws IOException, InterruptedException {
-		String url = "http://localhost:8080/subtasks/S-1";
+		String url = "subtasks/S-1";
 		String expectedJson = "\"subtasks,S-1,SUBTASKS,description SUBTASKS,NEW\"";
-		checkRequest(2, 200, url, "", expectedJson);
+		checkResponse(2, 200, url, "", expectedJson);
 	}
 }

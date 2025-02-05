@@ -14,9 +14,9 @@ public class GetHistoryHandlerTest extends SetUpServerForTests {
 		manager.getTaskById("T-1");
 		manager.getTaskById("S-1");
 
-		String url = "http://localhost:8080/history";
+		String url = "history";
 		String expectedJson = "[\"tasks,T-1,TASK,description TASK,NEW\",\"subtasks,S-1,SUBTASKS,description SUBTASKS,NEW\"]";
-		checkRequest(2, 200, url, "", expectedJson);
+		checkResponse(2, 200, url, "", expectedJson);
 	}
 
 }

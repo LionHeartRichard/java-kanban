@@ -17,25 +17,25 @@ public class PostTaskByIdHandlerTest extends SetUpServerForTests {
 	@Test
 	@Override
 	public void test() throws IOException, InterruptedException {
-		String url = "http://localhost:8080/tasks/T-1";
+		String url = "tasks/T-1";
 		String jsonBodyRequest = "\"tasks,T-1,UPDATE,UPDATE,NEW\"";
-		checkRequest(0, 201, url, jsonBodyRequest, "");
+		checkResponse(0, 201, url, jsonBodyRequest, "");
 	}
 
 	@DisplayName("/epics/{id} Post update epics")
 	@Test
 	public void testCreateEpic() throws IOException, InterruptedException {
-		String url = "http://localhost:8080/epics/E-1";
+		String url = "epics/E-1";
 		String jsonBodyRequest = "\"epics,E-1,UPDATE,UPDATE,NEW\"";
-		checkRequest(0, 201, url, jsonBodyRequest, "");
+		checkResponse(0, 201, url, jsonBodyRequest, "");
 	}
 
 	@DisplayName("/subtasks/{id} Post update subtasks")
 	@Test
 	public void testCreateSubtasks() throws IOException, InterruptedException {
-		String url = "http://localhost:8080/subtasks/S-1";
+		String url = "subtasks/S-1";
 		String jsonBodyRequest = "\"subtasks,S-1,UPDATE,UPDATE,NEW\"";
-		checkRequest(0, 201, url, jsonBodyRequest, "");
+		checkResponse(0, 201, url, jsonBodyRequest, "");
 	}
 
 	@DisplayName("/tasks/{id} No Update/406")
@@ -45,9 +45,9 @@ public class PostTaskByIdHandlerTest extends SetUpServerForTests {
 				"10:00 20.12.2024", 60);
 		manager.addTask(taskT4);
 
-		String url = "http://localhost:8080/tasks/T-1";
+		String url = "tasks/T-1";
 		String jsonBodyRequest = "\"tasks,T-1,UPDATE,UPDATE,NEW,10:30 20.12.2024,60\"";
-		checkRequest(0, 406, url, jsonBodyRequest, "");
+		checkResponse(0, 406, url, jsonBodyRequest, "");
 	}
 
 	@DisplayName("/epics/{id} No Update/406")
@@ -57,9 +57,9 @@ public class PostTaskByIdHandlerTest extends SetUpServerForTests {
 				"10:00 20.12.2024", 60);
 		manager.addTask(taskT4);
 
-		String url = "http://localhost:8080/epics/E-1";
+		String url = "epics/E-1";
 		String jsonBodyRequest = "\"epics,E-1,UPDATE,UPDATE,NEW,10:30 20.12.2024,60\"";
-		checkRequest(0, 406, url, jsonBodyRequest, "");
+		checkResponse(0, 406, url, jsonBodyRequest, "");
 	}
 
 	@DisplayName("/subtasks/{id} No Update/406")
@@ -69,9 +69,9 @@ public class PostTaskByIdHandlerTest extends SetUpServerForTests {
 				"10:00 20.12.2024", 60);
 		manager.addTask(taskT4);
 
-		String url = "http://localhost:8080/subtasks/S-1";
+		String url = "subtasks/S-1";
 		String jsonBodyRequest = "\"subtasks,S-1,UPDATE,UPDATE,NEW,10:30 20.12.2024,60\"";
-		checkRequest(0, 406, url, jsonBodyRequest, "");
+		checkResponse(0, 406, url, jsonBodyRequest, "");
 	}
 
 }

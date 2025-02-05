@@ -22,9 +22,9 @@ public class GetPrioritizedHandlerTest extends SetUpServerForTests {
 		manager.addTask(taskT4);
 		manager.addTask(taskT5);
 
-		String url = "http://localhost:8080/prioritized";
+		String url = "prioritized";
 		String expectedJson = "[\"tasks,T-4,Parent B-2,description parent B-2,NEW,10:00 20.12.2024,60\",\"tasks,T-5,Children B-2,description CHILDREN B-2,NEW,15:00 22.12.2024,120\"]";
-		checkRequest(2, 200, url, "", expectedJson);
+		checkResponse(2, 200, url, "", expectedJson);
 	}
 
 }
