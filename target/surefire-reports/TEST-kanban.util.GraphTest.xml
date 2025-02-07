@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="kanban.util.GraphTest" time="0.006" tests="6" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="kanban.util.GraphTest" time="0.007" tests="6" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -13,7 +13,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="RU"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk-21.0.5.0.11-1.fc40.x86_64/lib"/>
-    <property name="sun.java.command" value="/home/kerrigan_kein/yandex_praktikum/java-kanban/target/surefire/surefirebooter-20250114143953794_3.jar /home/kerrigan_kein/yandex_praktikum/java-kanban/target/surefire 2025-01-14T14-39-53_734-jvmRun1 surefire-20250114143953794_1tmp surefire_0-20250114143953794_2tmp"/>
+    <property name="sun.java.command" value="/home/kerrigan_kein/yandex_praktikum/java-kanban/target/surefire/surefirebooter-20250207114846951_3.jar /home/kerrigan_kein/yandex_praktikum/java-kanban/target/surefire 2025-02-07T11-48-46_902-jvmRun1 surefire-20250207114846951_1tmp surefire_0-20250207114846951_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/home/kerrigan_kein/yandex_praktikum/java-kanban/target/test-classes:/home/kerrigan_kein/yandex_praktikum/java-kanban/target/classes:/home/kerrigan_kein/.m2/repository/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar:/home/kerrigan_kein/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.17.2/jackson-core-2.17.2.jar:/home/kerrigan_kein/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.17.2/jackson-databind-2.17.2.jar:/home/kerrigan_kein/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.17.2/jackson-annotations-2.17.2.jar:/home/kerrigan_kein/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.1/junit-jupiter-engine-5.10.1.jar:/home/kerrigan_kein/.m2/repository/org/junit/platform/junit-platform-engine/1.10.1/junit-platform-engine-1.10.1.jar:/home/kerrigan_kein/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/kerrigan_kein/.m2/repository/org/junit/platform/junit-platform-commons/1.10.1/junit-platform-commons-1.10.1.jar:/home/kerrigan_kein/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.1/junit-jupiter-api-5.10.1.jar:/home/kerrigan_kein/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -28,7 +28,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
-    <property name="surefire.real.class.path" value="/home/kerrigan_kein/yandex_praktikum/java-kanban/target/surefire/surefirebooter-20250114143953794_3.jar"/>
+    <property name="surefire.real.class.path" value="/home/kerrigan_kein/yandex_praktikum/java-kanban/target/surefire/surefirebooter-20250207114846951_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.5+11"/>
     <property name="user.name" value="kerrigan_kein"/>
@@ -57,8 +57,8 @@
   </properties>
   <testcase name="bfsWhenNotEmptyGraphThenReturnListSubverticesInAmount" classname="kanban.util.GraphTest" time="0.001"/>
   <testcase name="dfsWhenNotEmptyGraphThenReturnSetSubverticesInAmount" classname="kanban.util.GraphTest" time="0.0"/>
-  <testcase name="addVertexWhenEmptyGraphAddNewVertexThenReturnNotEmpty" classname="kanban.util.GraphTest" time="0.0"/>
-  <testcase name="addEdgeWhenEmptyGraphAddTopVertexAndVertexThenReturnSizeForGraph" classname="kanban.util.GraphTest" time="0.001"/>
+  <testcase name="addVertexWhenEmptyGraphAddNewVertexThenReturnNotEmpty" classname="kanban.util.GraphTest" time="0.001"/>
+  <testcase name="addEdgeWhenEmptyGraphAddTopVertexAndVertexThenReturnSizeForGraph" classname="kanban.util.GraphTest" time="0.0"/>
   <testcase name="removeVertexWhenAddTopAndSubvertexThenReturnSize" classname="kanban.util.GraphTest" time="0.0"/>
   <testcase name="removeVerticesWhenGraphNotEmptyThenRetunrSize" classname="kanban.util.GraphTest" time="0.0"/>
 </testsuite>
